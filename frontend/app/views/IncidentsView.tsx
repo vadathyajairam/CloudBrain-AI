@@ -1,35 +1,29 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  AlertOctagon,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  RefreshCw,
+  Search,
+  Filter,
+  BrainCircuit,
+  ChevronDown,
+  ChevronUp,
+  ShieldAlert,
+  ArrowRight,
+  Activity,
+  Layers,
+} from "lucide-react";
+import { IncidentItem, api } from "../lib/api";
 
 interface Evidence {
   type: string;
   source: string;
   detail: string;
   collected_at?: string;
-}
-
-interface Incident {
-  id: string;
-  title: string;
-  description: string;
-  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-  status: "DETECTED" | "ACKNOWLEDGED" | "INVESTIGATING" | "REMEDIATING" | "RESOLVED" | "CLOSED";
-  service: string;
-  container_id?: string;
-  rule_id?: string;
-  detected_at: string;
-  updated_at?: string;
-  resolved_at?: string;
-  auto_resolved?: boolean;
-  evidence: Evidence[];
-  latest_analysis?: {
-    root_cause?: string;
-    confidence?: number | null;
-    recommendation?: string;
-    model_used?: string;
-  } | null;
 }
 
 interface IncidentStats {
@@ -40,26 +34,32 @@ interface IncidentStats {
 }
 
 function SeverityBadge({ severity }: { severity: string }) {
+  const styles: Record<string, string> = {
+    CRITICAL: "bg-rose-50 text-rose-700 border-rose-200",
+    HIGH: "bg-amber-50 text-amber-700 border-amber-200",
+    MEDIUM: "bg-yellow-50 text-yellow-800 border-yellow-200",
+    LOW: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  };
   return (
-    <span className={`status-badge severity-${severity}`}>{severity}</span>
+    <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md border font-mono ${styles[severity] || "bg-slate-100 text-slate-700 border-slate-200"}`}>
+      {severity}
+    </span>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
+  const styles: Record<string, string> = {
+    DETECTED: "bg-rose-50 text-rose-700 border-rose-200",
+    ACKNOWLEDGED: "bg-amber-50 text-amber-700 border-amber-200",
+    INVESTIGATING: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    REMEDIATING: "bg-purple-50 text-purple-700 border-purple-200",
+    RESOLVED: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    CLOSED: "bg-slate-100 text-slate-600 border-slate-200",
+  };
   return (
-    <span className={`status-badge incident-status-${status}`}>{status}</span>
-  );
-}
-
-function EmptyIncidents() {
-  return (
-    <div className="empty-state">
-      <div className="empty-state-icon">✅</div>
-      <div className="empty-state-title">No Active Incidents</div>
-      <div className="empty-state-desc">
-        All systems are operating normally. Incidents will appear here automatically when the detection engine triggers a rule.
-      </div>
-    </div>
+    <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-md border font-mono ${styles[status] || "bg-slate-100 text-slate-700 border-slate-200"}`}>
+      {status}
+    </span>
   );
 }
 
@@ -67,7 +67,7 @@ function IncidentRow({
   incident,
   onAction,
 }: {
-  incident: Incident;
+  incident: IncidentItem;
   onAction: (id: string, action: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -78,10 +78,14 @@ function IncidentRow({
 
   const nextAction = (): string | null => {
     switch (incident.status) {
-      case "DETECTED":      return "acknowledge";
-      case "ACKNOWLEDGED":  return "investigate";
-      case "INVESTIGATING": return "resolve";
-      default:              return null;
+      case "DETECTED":
+        return "acknowledge";
+      case "ACKNOWLEDGED":
+        return "investigate";
+      case "INVESTIGATING":
+        return "resolve";
+      default:
+        return null;
     }
   };
 
@@ -96,95 +100,87 @@ function IncidentRow({
   return (
     <>
       <tr
-        style={{ cursor: "pointer" }}
         onClick={() => setExpanded((p) => !p)}
+        className="hover:bg-slate-50/80 cursor-pointer transition-colors border-b border-slate-100 text-xs"
       >
-        <td>
+        <td className="py-3 px-4">
           <SeverityBadge severity={incident.severity} />
         </td>
-        <td>
-          <div style={{ fontWeight: 500, color: "var(--text-primary)", fontSize: 13 }}>
-            {incident.title}
-          </div>
+        <td className="py-3 px-4">
+          <div className="font-semibold text-slate-900">{incident.title}</div>
           {incident.service && (
-            <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
-              {incident.service}
-              {incident.rule_id && ` · rule: ${incident.rule_id}`}
+            <div className="text-[11px] text-slate-500 font-mono mt-0.5 flex items-center gap-1.5">
+              <span>Service: <strong className="text-slate-700">{incident.service}</strong></span>
+              {incident.rule_id && <span>• Rule: <span className="text-indigo-600">{incident.rule_id}</span></span>}
             </div>
           )}
         </td>
-        <td>
-          <StatusBadge status={incident.status} />
-          {incident.auto_resolved && (
-            <span style={{ fontSize: 10, color: "var(--text-muted)", marginLeft: 6 }}>auto</span>
-          )}
+        <td className="py-3 px-4">
+          <div className="flex items-center gap-1.5">
+            <StatusBadge status={incident.status} />
+            {incident.auto_resolved && (
+              <span className="text-[10px] font-mono text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                auto
+              </span>
+            )}
+          </div>
         </td>
-        <td style={{ color: "var(--text-muted)", fontSize: 12 }}>{detectedTime}</td>
-        <td>
-          {action && (
+        <td className="py-3 px-4 text-slate-500 font-mono text-[11px] whitespace-nowrap">
+          {detectedTime}
+        </td>
+        <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-end gap-2">
+            {action && (
+              <button
+                onClick={() => onAction(incident.id, action)}
+                className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition-colors"
+              >
+                {actionLabel[action]}
+              </button>
+            )}
             <button
-              className="btn btn-secondary"
-              style={{ fontSize: 11, padding: "3px 10px" }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onAction(incident.id, action);
-              }}
+              onClick={() => setExpanded((p) => !p)}
+              className="p-1 text-slate-400 hover:text-slate-600 rounded transition-colors"
             >
-              {actionLabel[action]}
+              {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
-          )}
+          </div>
         </td>
       </tr>
 
       {expanded && (
-        <tr>
-          <td
-            colSpan={5}
-            style={{
-              background: "var(--surface-1)",
-              padding: "0 0 0 0",
-              borderBottom: "1px solid var(--border)",
-            }}
-          >
-            <div style={{ padding: "14px 20px" }}>
+        <tr className="bg-slate-50/60 border-b border-slate-200">
+          <td colSpan={5} className="p-4">
+            <div className="space-y-3 max-w-4xl mx-auto">
               {/* Description */}
               {incident.description && (
-                <p style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 12 }}>
+                <div className="text-xs text-slate-700 bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+                  <strong className="text-slate-900 block mb-0.5">Description:</strong>
                   {incident.description}
-                </p>
+                </div>
               )}
 
               {/* AI Analysis */}
               {incident.latest_analysis && (
-                <div
-                  style={{
-                    background: "var(--surface-2)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "var(--radius)",
-                    padding: "12px 14px",
-                    marginBottom: 12,
-                  }}
-                >
-                  <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.4px" }}>
-                    AI Analysis · {incident.latest_analysis.model_used}
+                <div className="p-3.5 rounded-xl bg-white border border-indigo-100 shadow-2xs space-y-2">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 flex items-center gap-1.5 font-mono">
+                    <BrainCircuit className="w-3.5 h-3.5" />
+                    AI Root Cause Analysis • {incident.latest_analysis.model_used || "Synexis-RCA"}
                   </div>
                   {incident.latest_analysis.root_cause && (
-                    <div style={{ fontSize: 13, color: "var(--text-primary)", marginBottom: 6 }}>
-                      <strong>Root Cause:</strong> {incident.latest_analysis.root_cause}
+                    <div className="text-xs font-semibold text-slate-900">
+                      Root Cause: <span className="text-slate-700 font-normal">{incident.latest_analysis.root_cause}</span>
                     </div>
                   )}
-                  {incident.latest_analysis.confidence !== null && incident.latest_analysis.confidence !== undefined ? (
-                    <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>
-                      Confidence: <strong>{incident.latest_analysis.confidence}%</strong>
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: 12, color: "var(--warning)" }}>
-                      Confidence: Insufficient evidence
+                  {incident.latest_analysis.confidence !== null && incident.latest_analysis.confidence !== undefined && (
+                    <div className="text-xs text-slate-600">
+                      Confidence: <strong className="text-indigo-600 font-mono">{incident.latest_analysis.confidence}%</strong>
                     </div>
                   )}
                   {incident.latest_analysis.recommendation && (
-                    <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 6 }}>
-                      <strong>Recommendation:</strong> {incident.latest_analysis.recommendation}
+                    <div className="text-xs text-slate-700 bg-indigo-50/50 p-2.5 rounded-lg border border-indigo-100">
+                      <strong className="text-indigo-900 block mb-0.5">Recommendation:</strong>
+                      {incident.latest_analysis.recommendation}
                     </div>
                   )}
                 </div>
@@ -192,42 +188,23 @@ function IncidentRow({
 
               {/* Evidence */}
               {incident.evidence && incident.evidence.length > 0 && (
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.4px" }}>
-                    Evidence ({incident.evidence.length})
+                <div className="space-y-1.5">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                    Correlated Evidence ({incident.evidence.length})
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <div className="space-y-1">
                     {incident.evidence.map((ev, i) => (
                       <div
                         key={i}
-                        style={{
-                          display: "flex",
-                          gap: 10,
-                          fontSize: 12,
-                          color: "var(--text-secondary)",
-                          padding: "5px 0",
-                          borderBottom: i < incident.evidence.length - 1 ? "1px solid var(--border)" : "none",
-                        }}
+                        className="p-2 rounded-lg bg-white border border-slate-200 text-xs flex items-start gap-2 shadow-2xs"
                       >
-                        <span
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 600,
-                            padding: "1px 5px",
-                            borderRadius: 3,
-                            background: "var(--surface-3)",
-                            color: "var(--text-muted)",
-                            flexShrink: 0,
-                            alignSelf: "flex-start",
-                            marginTop: 1,
-                          }}
-                        >
+                        <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-mono font-bold shrink-0">
                           {ev.type}
                         </span>
-                        <span>
-                          <span style={{ color: "var(--text-muted)", marginRight: 6 }}>{ev.source}</span>
-                          {ev.detail}
-                        </span>
+                        <div className="min-w-0">
+                          <span className="text-slate-400 font-mono text-[11px] mr-2">[{ev.source}]</span>
+                          <span className="text-slate-800">{ev.detail}</span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -242,8 +219,8 @@ function IncidentRow({
 }
 
 export default function IncidentsView() {
-  const [activeIncidents, setActiveIncidents] = useState<Incident[]>([]);
-  const [resolvedIncidents, setResolvedIncidents] = useState<Incident[]>([]);
+  const [activeIncidents, setActiveIncidents] = useState<IncidentItem[]>([]);
+  const [resolvedIncidents, setResolvedIncidents] = useState<IncidentItem[]>([]);
   const [stats, setStats] = useState<IncidentStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"active" | "resolved">("active");
@@ -251,14 +228,13 @@ export default function IncidentsView() {
 
   const fetchIncidents = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/incidents`);
-      const data = await res.json();
+      const data = await api.getIncidents();
       setActiveIncidents(data.active_incidents || []);
       setResolvedIncidents(data.resolved_incidents || []);
       setStats(data.stats || null);
       setLastRefresh(new Date().toLocaleTimeString());
     } catch {
-      /* backend may not be running */
+      /* backend sync handling */
     } finally {
       setLoading(false);
     }
@@ -266,9 +242,13 @@ export default function IncidentsView() {
 
   const handleAction = async (id: string, action: string) => {
     try {
-      await fetch(`${API}/incidents/${id}/${action}`, { method: "PATCH" });
+      if (action === "acknowledge") await api.acknowledgeIncident(id);
+      else if (action === "investigate") await api.investigateIncident(id);
+      else if (action === "resolve") await api.resolveIncident(id, "Resolved by SRE Operator");
       await fetchIncidents();
-    } catch {}
+    } catch (err) {
+      console.error("Action error:", err);
+    }
   };
 
   useEffect(() => {
@@ -280,84 +260,117 @@ export default function IncidentsView() {
   const displayedIncidents = tab === "active" ? activeIncidents : resolvedIncidents;
 
   return (
-    <div style={{ padding: "24px 28px" }}>
-      {/* Header */}
-      <div style={{ marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+      {/* ── Top Header ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
-            Incidents
-          </h1>
-          <p style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>
-            Detected by the Synexis rule engine · auto-updated every 5s
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-slate-900 leading-tight flex items-center gap-2">
+              <AlertOctagon className="w-5 h-5 text-indigo-600" />
+              Incidents & Rule Violations Console
+            </h1>
+            <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full font-mono">
+              Auto-Synced (5s)
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Real-time incident stream detected by Synexis Detection Engine and database backend
           </p>
         </div>
-        <div style={{ textAlign: "right", fontSize: 11, color: "var(--text-muted)" }}>
-          {lastRefresh && <>Updated: {lastRefresh}</>}
+
+        <div className="flex items-center gap-3">
+          {lastRefresh && (
+            <span className="text-xs text-slate-400 font-mono hidden md:inline">
+              Updated: {lastRefresh}
+            </span>
+          )}
+          <button
+            onClick={fetchIncidents}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-medium transition-colors shadow-xs"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-indigo-600" : ""}`} />
+            <span>Sync Incidents</span>
+          </button>
         </div>
       </div>
 
-      {/* Stats */}
+      {/* ── Stat Summary Cards ── */}
       {stats && (
-        <div className="grid-4" style={{ marginBottom: 20 }}>
-          {[
-            { label: "Active", value: stats.active, cls: stats.active > 0 ? "danger" : "healthy" },
-            { label: "Critical Active", value: stats.critical_active, cls: stats.critical_active > 0 ? "critical" : "healthy" },
-            { label: "Resolved Today", value: stats.resolved_today, cls: "info" },
-            { label: "Total All Time", value: stats.total, cls: "muted" },
-          ].map((s) => (
-            <div key={s.label} className="card-sm">
-              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)" }}>{s.value}</div>
-              <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3 }}>{s.label}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
+            <div className="text-2xl font-bold text-slate-900 font-mono">{stats.active}</div>
+            <div className="text-xs font-medium text-slate-500 mt-1">Active Incidents</div>
+          </div>
+          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
+            <div className={`text-2xl font-bold font-mono ${stats.critical_active > 0 ? "text-rose-600" : "text-emerald-600"}`}>
+              {stats.critical_active}
             </div>
-          ))}
+            <div className="text-xs font-medium text-slate-500 mt-1">Critical Active</div>
+          </div>
+          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
+            <div className="text-2xl font-bold text-indigo-600 font-mono">{stats.resolved_today}</div>
+            <div className="text-xs font-medium text-slate-500 mt-1">Resolved Today</div>
+          </div>
+          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
+            <div className="text-2xl font-bold text-slate-700 font-mono">{stats.total}</div>
+            <div className="text-xs font-medium text-slate-500 mt-1">Total All-Time</div>
+          </div>
         </div>
       )}
 
-      {/* Tabs */}
-      <div style={{ display: "flex", gap: 2, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 0 }}>
-        {(["active", "resolved"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            style={{
-              padding: "7px 16px",
-              fontSize: 13,
-              fontWeight: 500,
-              cursor: "pointer",
-              background: "transparent",
-              border: "none",
-              color: tab === t ? "var(--text-primary)" : "var(--text-muted)",
-              borderBottom: tab === t ? "2px solid var(--accent)" : "2px solid transparent",
-              marginBottom: -1,
-              fontFamily: "var(--font-sans)",
-            }}
-          >
-            {t === "active" ? `Active (${activeIncidents.length})` : `Resolved (${resolvedIncidents.length})`}
-          </button>
-        ))}
+      {/* ── Tabs Navigation ── */}
+      <div className="flex border-b border-slate-200 gap-4">
+        {(["active", "resolved"] as const).map((t) => {
+          const count = t === "active" ? activeIncidents.length : resolvedIncidents.length;
+          const isActive = tab === t;
+          return (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`pb-3 text-xs font-bold transition-all border-b-2 flex items-center gap-2 ${
+                isActive
+                  ? "border-indigo-600 text-indigo-600"
+                  : "border-transparent text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              <span>{t === "active" ? "Active Incidents" : "Resolved Incidents"}</span>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
+                isActive ? "bg-indigo-50 text-indigo-700 border border-indigo-200" : "bg-slate-100 text-slate-600"
+              }`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Table */}
+      {/* ── Incidents Table ── */}
       {loading ? (
-        <div style={{ color: "var(--text-muted)", fontSize: 13, padding: "24px 0" }}>Loading incidents…</div>
+        <div className="p-12 text-center text-xs text-slate-500 font-mono">
+          Syncing latest incidents from backend detection engine...
+        </div>
       ) : displayedIncidents.length === 0 ? (
-        tab === "active" ? <EmptyIncidents /> : (
-          <div className="empty-state">
-            <div className="empty-state-icon">📋</div>
-            <div className="empty-state-title">No Resolved Incidents</div>
-            <div className="empty-state-desc">Resolved incidents will appear here.</div>
+        <div className="p-12 text-center rounded-xl bg-white border border-slate-200 shadow-sm space-y-2">
+          <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
+          <div className="text-sm font-bold text-slate-900">
+            {tab === "active" ? "No Active Incidents" : "No Resolved Incidents"}
           </div>
-        )
+          <div className="text-xs text-slate-500 max-w-sm mx-auto">
+            {tab === "active"
+              ? "All systems are operating normally. Any triggered detection rules will appear here automatically."
+              : "Resolved incidents will accumulate here for post-incident review."}
+          </div>
+        </div>
       ) : (
-        <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-          <table className="data-table">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <table className="w-full text-left border-collapse">
             <thead>
-              <tr>
-                <th style={{ width: 90 }}>Severity</th>
-                <th>Incident</th>
-                <th style={{ width: 140 }}>Status</th>
-                <th style={{ width: 160 }}>Detected</th>
-                <th style={{ width: 120 }}>Action</th>
+              <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th className="py-3 px-4 w-24">Severity</th>
+                <th className="py-3 px-4">Incident & Service</th>
+                <th className="py-3 px-4 w-36">Status</th>
+                <th className="py-3 px-4 w-44">Detected</th>
+                <th className="py-3 px-4 w-32 text-right">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -368,11 +381,6 @@ export default function IncidentsView() {
           </table>
         </div>
       )}
-
-      {/* Source attribution */}
-      <div style={{ marginTop: 16, fontSize: 11, color: "var(--text-muted)" }}>
-        Source: Synexis Detection Engine · Database-backed · No simulated data
-      </div>
     </div>
   );
 }

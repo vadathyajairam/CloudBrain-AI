@@ -194,12 +194,22 @@ class ContainerEngine:
 
     def _ping(self) -> bool:
         if self._client is None:
-            return False
+            try:
+                import docker
+                _candidate = docker.from_env(timeout=4)
+                _candidate.ping()
+                self._client = _candidate
+                self.docker_available = True
+                return True
+            except Exception:
+                self.docker_available = False
+                return False
         try:
             self._client.ping()
             self.docker_available = True
             return True
         except Exception:
+            self._client = None
             self.docker_available = False
             return False
 

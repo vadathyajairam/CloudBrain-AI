@@ -7,6 +7,7 @@ router = APIRouter(prefix="/containers", tags=["Containers"])
 def list_containers():
     return {
         "sandbox_mode": container_engine.is_sandbox_mode,
+        "docker_available": container_engine.docker_available,
         "containers": container_engine.list_containers()
     }
 

@@ -127,9 +127,14 @@ class KubernetesProvider:
 
     def is_available(self) -> bool:
         """Check if local Kubernetes cluster is reachable."""
-        self._last_checked = _utcnow()
+        now = _utcnow()
+        if hasattr(self, "_cached_available") and (now - self._last_checked).total_seconds() < 15:
+            return self._cached_available
+
+        self._last_checked = now
         if not self._kubectl_path:
             self._connected = False
+            self._cached_available = False
             return False
 
         try:
@@ -138,13 +143,15 @@ class KubernetesProvider:
                 [self._kubectl_path, "cluster-info"],
                 capture_output=True,
                 text=True,
-                timeout=3,
+                timeout=2,
                 check=False,
             )
-            self._connected = res.returncode == 0
+            self._connected = (res.returncode == 0)
+            self._cached_available = self._connected
             return self._connected
         except Exception:
             self._connected = False
+            self._cached_available = False
             return False
 
     def get_cluster_status(self) -> Dict[str, Any]:

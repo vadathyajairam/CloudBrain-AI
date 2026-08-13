@@ -74,23 +74,28 @@ export const LogsView: React.FC<LogsViewProps> = ({ onAnalyzeWithAI }) => {
   };
 
   return (
-    <div className="space-y-5 animate-fadeIn">
+    <div className="p-6 space-y-5 max-w-7xl mx-auto animate-fadeIn">
       {/* Header & AI Trigger */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <FileText className="w-5 h-5 text-cyan-400" />
-            Intelligent Log Explorer & Anomaly Detector
-          </h2>
-          <p className="text-xs text-slate-400">
-            Real-time streaming log ingestion across microservices with automated error clustering
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-slate-900 leading-tight flex items-center gap-2">
+              <FileText className="w-5 h-5 text-indigo-600" />
+              Intelligent Log Explorer & Anomaly Detector
+            </h1>
+            <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full font-mono">
+              Live Buffer Streaming
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Real-time log ingestion across microservices with automated error clustering
           </p>
         </div>
 
         <div className="flex items-center space-x-2.5">
           <button
             onClick={handleTriggerAI}
-            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white text-xs font-semibold shadow-lg shadow-indigo-950/40 transition-all"
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition-all"
           >
             <BrainCircuit className="w-4 h-4" />
             <span>Analyze with AI</span>
@@ -99,7 +104,7 @@ export const LogsView: React.FC<LogsViewProps> = ({ onAnalyzeWithAI }) => {
           <button
             onClick={handleClear}
             title="Clear buffer"
-            className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition-colors"
+            className="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 border border-slate-200 transition-colors shadow-2xs"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -108,16 +113,16 @@ export const LogsView: React.FC<LogsViewProps> = ({ onAnalyzeWithAI }) => {
 
       {/* Error Burst Notification Banner if errors detected */}
       {stats && stats.recent_error_count > 0 && (
-        <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/40 flex items-center justify-between">
+        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-between shadow-2xs">
           <div className="flex items-center space-x-3 text-xs">
-            <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-            <span className="text-rose-200">
-              High Anomaly Rate: <strong className="text-white font-mono">{stats.recent_error_count} error events</strong> detected in recent stream.
+            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+            <span className="text-rose-900 font-semibold">
+              High Anomaly Rate: <strong className="font-mono text-rose-700">{stats.recent_error_count} error events</strong> detected in recent stream.
             </span>
           </div>
           <button
             onClick={handleTriggerAI}
-            className="text-[11px] font-semibold text-rose-300 hover:text-white underline font-mono"
+            className="text-[11px] font-bold text-rose-700 hover:text-rose-900 underline font-mono"
           >
             Run Root Cause Diagnostic →
           </button>
@@ -125,7 +130,7 @@ export const LogsView: React.FC<LogsViewProps> = ({ onAnalyzeWithAI }) => {
       )}
 
       {/* Filter and Search Bar */}
-      <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+      <div className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
         {/* Search */}
         <div className="relative flex-1 min-w-[240px]">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -134,7 +139,7 @@ export const LogsView: React.FC<LogsViewProps> = ({ onAnalyzeWithAI }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search logs by keyword, trace ID, or error message..."
-            className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-lg pl-9 pr-4 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none transition-colors"
           />
         </div>
 
@@ -144,7 +149,7 @@ export const LogsView: React.FC<LogsViewProps> = ({ onAnalyzeWithAI }) => {
           <select
             value={selectedService}
             onChange={(e) => setSelectedService(e.target.value)}
-            className="bg-slate-950 border border-slate-800 text-xs text-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer"
+            className="bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer font-mono"
           >
             <option value="all">All Services</option>
             <option value="backend">backend</option>
@@ -156,19 +161,19 @@ export const LogsView: React.FC<LogsViewProps> = ({ onAnalyzeWithAI }) => {
         </div>
 
         {/* Level filter */}
-        <div className="flex items-center space-x-1 bg-slate-950 border border-slate-800 p-0.5 rounded-lg text-xs font-mono">
+        <div className="flex items-center space-x-1 bg-slate-50 border border-slate-200 p-1 rounded-lg text-xs font-mono">
           {["ALL", "INFO", "WARN", "ERROR", "CRITICAL"].map((lvl) => (
             <button
               key={lvl}
               onClick={() => setSelectedLevel(lvl)}
-              className={`px-2.5 py-1 rounded font-semibold transition-colors ${
+              className={`px-2 py-0.5 rounded font-semibold transition-colors ${
                 selectedLevel === lvl
                   ? lvl === "ERROR" || lvl === "CRITICAL"
                     ? "bg-rose-600 text-white"
                     : lvl === "WARN"
                     ? "bg-amber-600 text-white"
                     : "bg-indigo-600 text-white"
-                  : "text-slate-400 hover:text-white"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               {lvl}
@@ -181,25 +186,25 @@ export const LogsView: React.FC<LogsViewProps> = ({ onAnalyzeWithAI }) => {
           onClick={() => setIsAutoRefresh(!isAutoRefresh)}
           className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono border transition-all ${
             isAutoRefresh
-              ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-300"
-              : "bg-slate-950 border-slate-800 text-slate-400"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+              : "bg-slate-50 border-slate-200 text-slate-500"
           }`}
         >
-          <span className={`w-2 h-2 rounded-full ${isAutoRefresh ? "bg-emerald-400 animate-pulse" : "bg-slate-500"}`} />
+          <span className={`w-2 h-2 rounded-full ${isAutoRefresh ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
           <span>{isAutoRefresh ? "Live Stream" : "Paused"}</span>
         </button>
       </div>
 
-      {/* Logs Table / Stream View */}
-      <div className="rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden shadow-2xl">
-        <div className="p-3 bg-slate-900/60 border-b border-slate-800 text-[11px] font-mono text-slate-400 flex items-center justify-between">
-          <span>Displaying {logs.length} events</span>
-          <span>Time: UTC+00:00 / Host Local</span>
+      {/* Logs Table / Console View */}
+      <div className="rounded-xl bg-slate-950 border border-slate-800 overflow-hidden shadow-xl">
+        <div className="p-3 bg-slate-900 border-b border-slate-800 text-[11px] font-mono text-slate-400 flex items-center justify-between">
+          <span>Displaying {logs.length} log events</span>
+          <span>Time: UTC / Host Local</span>
         </div>
 
         <div className="max-h-[60vh] overflow-y-auto divide-y divide-slate-800/60 font-mono text-xs">
           {logs.length === 0 ? (
-            <div className="p-12 text-center text-slate-500 text-xs">
+            <div className="p-12 text-center text-slate-500 text-xs font-mono">
               No matching log records found for the applied filters.
             </div>
           ) : (
@@ -210,7 +215,7 @@ export const LogsView: React.FC<LogsViewProps> = ({ onAnalyzeWithAI }) => {
               return (
                 <div
                   key={log.id}
-                  className={`p-2.5 flex items-start justify-between group hover:bg-slate-900/60 transition-colors ${
+                  className={`p-2.5 flex items-start justify-between group hover:bg-slate-900/80 transition-colors ${
                     isError
                       ? "bg-rose-950/20 text-rose-200"
                       : isWarn

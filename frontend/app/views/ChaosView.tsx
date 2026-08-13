@@ -6,10 +6,10 @@ import {
   Play, 
   RefreshCcw, 
   AlertTriangle, 
-  CheckCircle2, 
   ShieldAlert, 
   Terminal, 
-  Activity 
+  Activity,
+  ArrowRight
 } from "lucide-react";
 import { ChaosScenario } from "../lib/api";
 
@@ -49,15 +49,20 @@ export const ChaosView: React.FC<ChaosViewProps> = ({
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="p-6 space-y-6 max-w-7xl mx-auto animate-fadeIn">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
         <div>
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <Flame className="w-5 h-5 text-amber-400" />
-            Chaos Sandbox & Real-World Failure Lab
-          </h2>
-          <p className="text-xs text-slate-400">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-slate-900 leading-tight flex items-center gap-2">
+              <Flame className="w-5 h-5 text-amber-500" />
+              Chaos Sandbox & Real-World Failure Lab
+            </h1>
+            <span className="px-2 py-0.5 text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 rounded-full font-mono">
+              Controlled Environment
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 mt-0.5">
             Inject realistic production outages to showcase Synexis AI’s end-to-end detection, RCA, and remediation workflow
           </p>
         </div>
@@ -66,7 +71,7 @@ export const ChaosView: React.FC<ChaosViewProps> = ({
           <button
             onClick={handleReset}
             disabled={loadingId === "reset"}
-            className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-950/40 transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-all"
           >
             <RefreshCcw className={`w-3.5 h-3.5 ${loadingId === "reset" ? "animate-spin" : ""}`} />
             <span>Reset All Failure States</span>
@@ -76,14 +81,14 @@ export const ChaosView: React.FC<ChaosViewProps> = ({
 
       {/* Active Incident Warning */}
       {activeScenario && (
-        <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/50 shadow-xl shadow-rose-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center space-x-3 text-xs">
-            <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 animate-pulse" />
+            <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 animate-pulse" />
             <div>
-              <span className="text-rose-200 font-semibold block">
-                Chaos Outage Active: <strong className="text-white font-mono">{activeScenario}</strong>
+              <span className="text-rose-900 font-bold block">
+                Chaos Outage Active: <strong className="font-mono text-rose-700">{activeScenario}</strong>
               </span>
-              <span className="text-slate-300 text-[11px]">
+              <span className="text-rose-700 text-[11px]">
                 Metrics and error logs are currently degraded. Inspect the diagnosis in the AI Root Cause tab.
               </span>
             </div>
@@ -91,9 +96,10 @@ export const ChaosView: React.FC<ChaosViewProps> = ({
 
           <button
             onClick={onOpenInvestigation}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-lg transition-all"
+            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition-all flex items-center gap-1.5 shrink-0"
           >
-            Investigate Incident →
+            <span>Investigate Incident</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
@@ -107,18 +113,18 @@ export const ChaosView: React.FC<ChaosViewProps> = ({
           return (
             <div
               key={sc.id}
-              className={`p-5 rounded-2xl border backdrop-blur-xl transition-all flex flex-col justify-between ${
+              className={`p-5 rounded-xl border bg-white shadow-sm transition-all flex flex-col justify-between space-y-4 ${
                 isActive
-                  ? "bg-rose-950/30 border-rose-500 shadow-xl shadow-rose-950/30"
-                  : "bg-slate-900/70 border-slate-800 hover:border-slate-700"
+                  ? "border-rose-300 ring-2 ring-rose-200"
+                  : "border-slate-200 hover:border-slate-300"
               }`}
             >
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className={`px-2 py-0.5 text-[9px] font-mono font-bold rounded ${
+                  <span className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded-md border ${
                     sc.severity === "CRITICAL"
-                      ? "bg-rose-950 text-rose-300 border border-rose-800"
-                      : "bg-amber-950 text-amber-300 border border-amber-800"
+                      ? "bg-rose-50 text-rose-700 border-rose-200"
+                      : "bg-amber-50 text-amber-700 border-amber-200"
                   }`}>
                     {sc.severity}
                   </span>
@@ -127,34 +133,34 @@ export const ChaosView: React.FC<ChaosViewProps> = ({
                   </span>
                 </div>
 
-                <h3 className="text-sm font-bold text-white leading-tight">
+                <h3 className="text-sm font-bold text-slate-900 leading-tight">
                   {sc.title}
                 </h3>
 
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-600 leading-relaxed">
                   {sc.description}
                 </p>
 
-                <div className="space-y-1 pt-1">
-                  <span className="text-[10px] font-mono text-slate-500 uppercase block font-semibold">
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[10px] font-mono text-slate-400 uppercase block font-semibold">
                     Expected Symptoms:
                   </span>
                   {sc.symptoms.map((s, idx) => (
-                    <div key={idx} className="text-[10px] text-slate-300 font-mono bg-slate-950/60 p-1.5 rounded border border-slate-800/80">
+                    <div key={idx} className="text-[11px] text-slate-700 font-mono bg-slate-50 p-2 rounded-lg border border-slate-100">
                       • {s}
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="mt-5 pt-3 border-t border-slate-800">
+              <div className="pt-3 border-t border-slate-100">
                 <button
                   onClick={() => handleTrigger(sc.id)}
                   disabled={isActive || isLoading}
                   className={`w-full py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 ${
                     isActive
-                      ? "bg-rose-600/30 text-rose-300 border border-rose-500/50 cursor-default"
-                      : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-950/50"
+                      ? "bg-rose-50 text-rose-700 border border-rose-200 cursor-default"
+                      : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
                   }`}
                 >
                   <Play className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />

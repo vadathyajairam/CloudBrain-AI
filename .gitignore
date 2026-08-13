@@ -48,6 +48,8 @@ logs/
 
 # ── Databases & Caches ────────────────────────────────────
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
 .pytest_cache/
