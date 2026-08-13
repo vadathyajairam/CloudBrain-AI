@@ -116,6 +116,8 @@ Synexis introduces a fully integrated, safe, evidence-grounded operational loop:
 > **High-Resolution Vector Diagrams:** Comprehensive architecture, sandbox, workflow, and lifecycle vector diagrams are available in [`docs/diagrams/DIAGRAMS.md`](docs/diagrams/DIAGRAMS.md) and as SVG assets in [`docs/diagrams/`](docs/diagrams/).
 >
 > **Visual Walkthrough & Evidence Catalog:** Complete 13-state operational visual evidence walkthrough is documented in [`docs/screenshots/SCREENSHOTS.md`](docs/screenshots/SCREENSHOTS.md) and as SVG visual captures in [`docs/screenshots/`](docs/screenshots/).
+>
+> **Academic Project Report:** The comprehensive 26-section academic specification is published at [`docs/report/SYNEXIS_PROJECT_REPORT.md`](docs/report/SYNEXIS_PROJECT_REPORT.md).
 
 ---
 
