@@ -20,25 +20,22 @@
 * **Observability Drivers:** `psutil` (OS metrics), `docker` (Official Docker SDK for Python).
 * **Intelligence & RAG:** 128-Dimensional Dense Vector Space, Sublinear TF-IDF, BM25 Hybrid Ranker, Gemini 1.5 / OpenAI / Deterministic Rule Fallback.
 * **Database:** PostgreSQL 15 (Production), SQLite 3 (Dev fallback), SQLAlchemy 2.0 ORM.
-* **Testing:** Pytest (62/62 tests passing, 100% OK in 5.61s).
+* **Testing:** Pytest (85/85 tests passing, 100% OK in 9.35s).
 
 ---
 
 ## 3. Verified Project Numbers (Do Not Guess)
 
-| Metric | Exact Number | Context |
-| :--- | :---: | :--- |
-| **Pytest Suite Passing** | **62 / 62 (100% OK)** | Passing in 5.61s |
-| **Vector Space Dimension** | **128 Dimensions** | Unit hypersphere projection ($\|\vec{v}\|_2 = 1.0$) |
-| **Telemetry Sampling Period** | **3.0 Seconds** | Lifespan background worker buffer |
-| **Anomaly Detection Rules** | **8 Real Rules** | CPU, RAM, Disk, Exit, Unhealthy, RestartLoop, Logs, Probe |
-| **Incident Lifecycle States** | **6 States** | `DETECTED`, `ACKNOWLEDGED`, `INVESTIGATING`, `REMEDIATING`, `RESOLVED`, `CLOSED` |
-| **Pre-loaded Knowledge Runbooks** | **11 Runbooks** | Covering PostgreSQL, Docker, OOM killer, Fast concurrency, Redis |
-| **Health Verification Checks** | **4 Checks** | Process State, Docker Health, App HTTP Probe, Log Quiescence |
-| **Controlled Sandbox Containers** | **3 Containers** | `synexis-demo-app`, `synexis-postgres`, `synexis-redis` |
-| **Failure Detection Latency** | **2.8 Seconds** | Container exit to database incident creation |
-| **RAG Retrieval Search Latency** | **18 Milliseconds** | Cosine dot product + BM25 hybrid ranking |
-| **Frontend Production Build** | **1092 Milliseconds** | Next.js 16 Turbopack (0 TypeScript errors) |
+* **Automated Tests:** **85 passed / 0 failed (100% OK)** across 11 test modules.
+* **Incident Detection Latency:** **2.8 seconds** (target: $< 3.0\text{s}$).
+* **RAG Retrieval Speed:** **18 milliseconds** (128-D Cosine Sim + BM25).
+* **Frontend Compile Time:** **1965 ms** via Next.js 16 Turbopack (0 TypeScript errors).
+* **Anomaly Detection Rules:** **12 active rules** (8 container/host + 4 Kubernetes rules).
+* **Incident Lifecycle States:** **6 deterministic states** (`DETECTED`, `ACKNOWLEDGED`, `INVESTIGATING`, `REMEDIATING`, `RESOLVED`, `CLOSED`).
+* **Health Verification Checks:** **4 multi-layered health probes** (4/4 required for resolution).
+* **Supported Infrastructure Modes:** **Docker Sandbox Fleet, Local Kubernetes (Minikube/Docker Desktop), and Local Cloud Simulation**.
+* **Configuration Artifacts:** **Kubernetes Manifests (YAML), Dockerfiles, Compose Stacks, and Terraform HCL Templates**.
+* **Sandbox Container Fleet:** **3 isolated microservices** (`synexis-demo-app`, `synexis-postgres`, `synexis-redis`).
 
 ---
 

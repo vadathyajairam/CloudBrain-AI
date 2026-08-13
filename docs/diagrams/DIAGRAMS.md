@@ -279,3 +279,70 @@ graph TD
     Backend --> Intelligence
     Backend --> Storage
 ```
+
+---
+
+## 11. Multi-Provider Infrastructure Architecture
+
+```mermaid
+graph TD
+    subgraph SynexisCore ["Synexis Core Telemetry Pipeline"]
+        IP["InfrastructureProvider (Abstract Base)"]
+    end
+
+    subgraph ConcreteProviders ["Concrete Providers"]
+        DP["DockerProvider\n(psutil + Docker SDK)"]
+        KP["KubernetesProvider\n(Local K8s / Minikube)"]
+        SP["SimulatedCloudProvider\n(Virtual VPC, DB, Cache)"]
+        CP["ExternalCloudStubProvider\n(AWS / Azure / GCP)"]
+    end
+
+    subgraph Targets ["Execution Targets"]
+        T_DOCKER["synexis-* Docker Sandbox Fleet"]
+        T_K8S["Local Kubernetes Pods & Deployments"]
+        T_SIM["Academic Cloud Topology Simulation"]
+        T_CLOUD["Unconnected Cloud Stubs"]
+    end
+
+    IP --> DP
+    IP --> KP
+    IP --> SP
+    IP --> CP
+
+    DP --> T_DOCKER
+    KP --> T_K8S
+    SP --> T_SIM
+    CP -.-> T_CLOUD
+```
+
+---
+
+## 12. Configuration Artifact Generation & Operator Review Lifecycle
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Operator as SRE Operator
+    participant RCA as AI RCA Engine
+    participant RAG as Dense Vector RAG
+    participant Gen as Artifact Generator
+    participant Val as Artifact Validator
+    participant DB as Audit & Artifact Store
+
+    RCA->>RAG: Retrieve remediating runbook context
+    RAG-->>RCA: Runbook snippets + recommended manifest config
+    RCA->>Gen: Request artifact generation (K8s / Docker / Terraform)
+    Gen->>Val: Pass raw artifact content for static validation
+    Val-->>Gen: Return ValidationReport (VALID / WARNING / INVALID)
+    Gen->>DB: Store artifact as PENDING_REVIEW
+    DB-->>Operator: Display in Configuration Artifacts UI
+    
+    alt Operator Approves Artifact
+        Operator->>DB: Approve Artifact (Role: admin / sre_operator)
+        DB-->>Operator: Marked APPROVED (Ready for manual deploy)
+    else Operator Rejects Artifact
+        Operator->>DB: Reject Artifact
+        DB-->>Operator: Marked REJECTED
+    end
+```
+

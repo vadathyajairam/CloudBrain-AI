@@ -161,6 +161,27 @@ $$\text{CosineSim}(\vec{q}, \vec{d}) = \vec{q} \cdot \vec{d} = \sum_{i=1}^{128} 
 ## 8. Team Presentation Role Division (For 3-4 Students)
 
 * **Member 1 (Introduction & Architecture):** Explains cloud-native complexity, problem statement, existing system limitations, system architecture, and technology stack.
-* **Member 2 (Observability, Detection & Database):** Explains `psutil` sampling, Docker SDK inspection, 8 anomaly detection rules, deduplication fingerprints, and relational database schema.
+* **Member 2 (Observability, Detection & Database):** Explains `psutil` sampling, Docker SDK inspection, 12 anomaly detection rules, deduplication fingerprints, and relational database schema.
 * **Member 3 (Vector RAG & AI Root Cause Analysis):** Explains 128-D vector embeddings, sublinear TF-IDF math, BM25 hybrid ranking, evidence bundling, LLM reasoning, and deterministic rule fallback.
-* **Member 4 (Remediation, 4-Point Verification & Live Demo):** Demonstrates the live failure scenario, rejection safety gate, operator approval, 4 health checks, dynamic RAG learning, and audit logging.
+* **Member 4 (Remediation, 4-Point Verification & Live Demo):** Demonstrates the live failure scenario, rejection safety gate, operator approval, 4 health checks, dynamic RAG learning, configuration artifacts, and audit logging.
+
+---
+
+## 9. Kubernetes & Infrastructure Provider Viva Questions
+
+### Q29: How does Synexis support Kubernetes?
+**Answer:** Synexis includes a dedicated `KubernetesProvider` that probes local clusters (Docker Desktop K8s, Minikube, Kind) via kubeconfig/kubectl to monitor Pod statuses, restart counts, Deployments, and Services. It evaluates 4 native Kubernetes anomaly rules (`pod_crash_loop`, `pod_failed`, `pod_not_ready`, `deployment_unavailable`). When no cluster is active, it reports `Kubernetes: NOT CONNECTED` gracefully without crashing.
+
+### Q30: How does Synexis handle cloud resources without student cloud bills?
+**Answer:** Synexis implements a local `SimulatedCloudProvider` that represents cloud-native topologies (Virtual VPC `10.0.0.0/16`, Virtual Compute Instances, Managed PostgreSQL Database, and Managed Redis Cache) labeled strictly as `LOCAL SIMULATION`. External connectors (AWS/Azure/GCP) are modeled via clean interfaces and marked `Not Connected`.
+
+---
+
+## 10. Configuration Artifact & IaC Generation Viva Questions
+
+### Q31: How does Configuration Artifact Generation work?
+**Answer:** When an incident is diagnosed by AI RCA, Synexis can generate remediating Kubernetes manifests (Deployment YAML, Service YAML), hardened Dockerfiles, compose stacks, or Terraform HCL templates. Every generated artifact passes through our static `ArtifactValidator` (YAML schema check, container resource limits, non-root user verification, HCL brace checks) before staging in the UI for operator review.
+
+### Q32: Can the AI automatically apply generated Kubernetes manifests or run Terraform apply?
+**Answer:** **No, absolutely not.** Synexis enforces a strict safety boundary: AI can generate templates and recommend changes, but applying Kubernetes YAML or executing Terraform requires explicit, manual operator approval. Arbitrary shell or CLI execution is strictly forbidden.
+

@@ -115,55 +115,76 @@ def _get_environments() -> list[dict[str, Any]]:
         "last_checked": now_iso,
     })
 
-    # 6. Kubernetes — Not Connected
+    # 6. Local Kubernetes Provider — REAL PROBE
+    from backend.app.core.kubernetes_provider import kubernetes_provider
+    k8s_status = kubernetes_provider.get_cluster_status()
     envs.append({
         "id": "kubernetes",
-        "name": "Kubernetes Cluster",
+        "name": "Local Kubernetes Cluster",
         "env_type": "kubernetes",
-        "connected": False,
-        "status": "not_configured",
-        "status_detail": "Not Connected (Future Extension)",
+        "connected": k8s_status.get("connected", False),
+        "status": "connected" if k8s_status.get("connected", False) else "disconnected",
+        "status_detail": (
+            f"Connected to {k8s_status.get('type')}"
+            if k8s_status.get("connected")
+            else "Not Connected (Docker Desktop K8s / Minikube not detected)"
+        ),
         "data_provided": ["nodes", "pods", "deployments", "services", "events"],
-        "source_library": "kubernetes-client (planned)",
-        "last_checked": None,
+        "source_library": "kubectl / Kubernetes API client",
+        "last_checked": now_iso,
     })
 
-    # 7. AWS Cloud — Not Connected
+    # 7. Local Cloud Simulation — REAL SIMULATOR
+    from backend.app.core.cloud_simulator import cloud_simulator
+    sim_status = cloud_simulator.get_status()
+    envs.append({
+        "id": "simulated_cloud",
+        "name": "Local Cloud Simulation",
+        "env_type": "simulated_cloud",
+        "connected": True,
+        "status": "connected",
+        "status_detail": f"Local Cloud Simulation Active · {sim_status.get('resource_count', 0)} virtual cloud resources",
+        "data_provided": ["virtual_vpc", "virtual_compute", "managed_postgres", "managed_redis"],
+        "source_library": "Synexis Cloud Simulator (Academic Topology)",
+        "last_checked": now_iso,
+    })
+
+    # 8. AWS Cloud — Optional External Connector
     envs.append({
         "id": "aws",
         "name": "AWS Cloud",
         "env_type": "aws",
         "connected": False,
         "status": "not_configured",
-        "status_detail": "Not Connected (Future Extension)",
+        "status_detail": "Not Connected (Optional External Cloud Connector)",
         "data_provided": ["ec2", "ecs", "rds", "cloudwatch", "lambda"],
-        "source_library": "boto3 (planned)",
+        "source_library": "boto3 (optional)",
         "last_checked": None,
     })
 
-    # 8. Azure Cloud — Not Connected
+    # 9. Azure Cloud — Optional External Connector
     envs.append({
         "id": "azure",
         "name": "Azure Cloud",
         "env_type": "azure",
         "connected": False,
         "status": "not_configured",
-        "status_detail": "Not Connected (Future Extension)",
+        "status_detail": "Not Connected (Optional External Cloud Connector)",
         "data_provided": ["aks", "virtual_machines", "azure_monitor"],
-        "source_library": "azure-sdk (planned)",
+        "source_library": "azure-sdk (optional)",
         "last_checked": None,
     })
 
-    # 9. Google Cloud (GCP) — Not Connected
+    # 10. Google Cloud (GCP) — Optional External Connector
     envs.append({
         "id": "gcp",
         "name": "Google Cloud Platform",
         "env_type": "gcp",
         "connected": False,
         "status": "not_configured",
-        "status_detail": "Not Connected (Future Extension)",
+        "status_detail": "Not Connected (Optional External Cloud Connector)",
         "data_provided": ["gke", "compute_engine", "cloud_logging"],
-        "source_library": "google-cloud-sdk (planned)",
+        "source_library": "google-cloud-sdk (optional)",
         "last_checked": None,
     })
 

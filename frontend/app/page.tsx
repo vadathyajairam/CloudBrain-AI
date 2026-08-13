@@ -26,6 +26,7 @@ import { ConfigView } from "./views/ConfigView";
 import { ChaosView } from "./views/ChaosView";
 import { RemediationView } from "./views/RemediationView";
 import DataSourcesView from "./views/DataSourcesView";
+import ArtifactsView from "./views/ArtifactsView";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>("dashboard");
@@ -207,6 +208,8 @@ export default function App() {
               onOpenInvestigation={() => handleOpenInvestigation()}
             />
           )}
+
+          {activeTab === "artifacts" && <ArtifactsView />}
 
           {activeTab === "data_sources" && <DataSourcesView />}
 

@@ -13,17 +13,18 @@
 
 Modern microservice architectures rely on distributed container runtimes that emit high-velocity telemetry, multi-dimensional compute metrics, and heterogeneous log streams. When production incidents occur, Site Reliability Engineers (SREs) face severe diagnostic friction: manual correlation across telemetry sources is slow, knowledge in troubleshooting runbooks remains fragmented, and unguided remediation risks cascading outages.
 
-This report presents **Synexis**, a full-stack, closed-loop intelligent infrastructure analysis and remediation platform. Operating over a controlled Docker environment, Synexis combines:
-1. Continuous sub-second host and container telemetry ingestion (`psutil`, official Docker Engine SDK).
-2. Rule-based anomaly detection evaluating 8 continuous system metrics and container states.
+This report presents **Synexis**, a full-stack, closed-loop intelligent infrastructure analysis and remediation platform. Operating over Docker, local Kubernetes, and local simulated cloud environments, Synexis combines:
+1. Continuous sub-second host, container, and Kubernetes cluster telemetry ingestion (`psutil`, official Docker Engine SDK, Kubernetes Provider).
+2. Rule-based anomaly detection evaluating 12 continuous system metrics, container states, and pod health.
 3. Persistent 6-state incident lifecycle management backed by a relational database (PostgreSQL / SQLite).
 4. A **128-dimensional Dense Vector Space Model** using sublinear TF-IDF scaling ($1 + \ln(1+\text{tf})$), subword tokenization, and L2 unit-norm normalization, hybridized with BM25 term weighting ($0.60 \times \text{CosineSim} + 0.40 \times \text{BM25}$) for semantic retrieval of SRE runbooks and past incident post-mortems.
 5. Multi-modal AI Root Cause Analysis (RCA) grounded strictly in evidence bundles and retrieved runbook citations.
-6. Role-based, human-in-the-loop remediation safety gating enforcing strict allowlisted actions on `synexis-*` containers, preventing raw arbitrary shell command execution.
-7. Automated **4-point health verification** (Process state, Docker healthcheck, HTTP `/health` probe, and log error rate quiescence) prior to incident resolution.
-8. Dynamic closed-loop incident learning that automatically vectorizes resolved post-mortems for future similarity retrieval.
+6. Automated **Configuration Artifact & IaC Generation** producing validated Kubernetes manifests, Dockerfiles, compose stacks, and Terraform HCL templates with static syntax checking.
+7. Role-based, human-in-the-loop remediation safety gating enforcing strict allowlisted actions on `synexis-*` containers and manual review of generated infrastructure templates, prohibiting raw arbitrary shell commands.
+8. Automated **4-point health verification** (Process state, Docker healthcheck, HTTP `/health` probe, and log error rate quiescence) prior to incident resolution.
+9. Dynamic closed-loop incident learning that automatically vectorizes resolved post-mortems for future similarity retrieval.
 
-The platform is validated with a 62-test automated unit and integration suite (100% pass rate) and verified against live controlled microservice failures in a Docker sandbox.
+The platform is validated with an 85-test automated unit and integration suite (100% pass rate) and verified against live controlled microservice failures in a Docker sandbox.
 
 ---
 

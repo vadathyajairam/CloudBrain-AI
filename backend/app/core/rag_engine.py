@@ -304,21 +304,52 @@ When the kernel encounters an allocation request that cannot be satisfied by rec
 The process with the highest `oom_score` receives `SIGKILL` (Exit Code 137). In Docker, container cgroups enforce isolated memory boundaries (`memory.limit_in_bytes`), triggering container-level OOM killing without taking down the host OS.""",
     },
     {
-        "id": "DOC-TECH-NETWORKING-05",
-        "title": "Container Bridge Networking, DNS Resolution & Port Binding",
-        "category": "Technical Documentation",
-        "tags": ["networking", "docker_network", "bridge", "iptables", "nat", "dns", "embedded_dns", "ports"],
-        "content": """# Container Bridge Networking, DNS Resolution & Port Binding
+        "id": "RUNBOOK-K8S-01",
+        "title": "Kubernetes Pod CrashLoopBackOff & Manifest Remediation",
+        "category": "Runbook",
+        "tags": ["kubernetes", "k8s", "pod", "crashloopbackoff", "deployment", "manifest", "probes"],
+        "content": """# Kubernetes Pod CrashLoopBackOff & Manifest Remediation
 
-### Docker Bridge Network (`bridge` / user-defined bridge)
-User-defined Docker networks create an internal software bridge on the host (`br-*`).
-- **Embedded DNS Server (127.0.0.11):** Containers automatically resolve sibling container names to their private bridge IP addresses (e.g. `synexis-postgres` -> `172.20.0.3`).
-- **Port Mapping (DNAT):** Host port bindings (e.g. `5050:5000`) configure Linux `iptables` / `nftables` PREROUTING rules in the `nat` table to forward traffic from host interfaces into the container veth pair.
+### Symptoms
+- Pod phase shows `CrashLoopBackOff`, `Error`, or `ImagePullBackOff`.
+- Synexis Kubernetes Provider triggers `pod_crash_loop` or `excessive_pod_restarts`.
+- Deployment available replicas drop below desired count.
 
-### Diagnostic Matrix
-- Check DNS resolution: `docker exec <container> nslookup synexis-postgres`.
-- Check listening ports on host: `netstat -tlpn` / `Get-NetTCPConnection` on Windows.
-- Connection Refused: Service not listening on `0.0.0.0` or container not running.""",
+### Root Causes
+1. **Application Panic on Startup:** Missing environment variable, database connection refusal, or missing volume mount.
+2. **Aggressive Readiness / Liveness Probe:** `initialDelaySeconds` too short; kubelet kills container before startup completes.
+3. **Memory cgroup OOMKilled:** Pod memory limits (`resources.limits.memory`) set lower than application heap baseline.
+
+### Diagnostic Steps
+1. Inspect pod events: `kubectl describe pod <pod-name>`.
+2. Inspect application crash logs: `kubectl logs <pod-name> --previous`.
+3. Check resource constraints and probe timings in deployment manifest.
+
+### Remediation Actions
+1. **Generate Corrected Manifest:** Generate hardened deployment manifest with relaxed initialDelaySeconds and adjusted memory ceiling.
+2. **Apply Manifest after Approval:** Operator reviews and applies corrected YAML.
+3. **Verify Pod Readiness:** Confirm pod transitions to `Running` and readiness probe passes.""",
+    },
+    {
+        "id": "RUNBOOK-TF-01",
+        "title": "Terraform Infrastructure Drift & Configuration Alignment",
+        "category": "Runbook",
+        "tags": ["terraform", "iac", "hcl", "drift", "template", "infrastructure", "state"],
+        "content": """# Terraform Infrastructure Drift & Configuration Alignment
+
+### Symptoms
+- Discrepancy between declared HCL infrastructure definitions and active container runtime state.
+- Unplanned container restart or port binding collision on host interfaces.
+
+### Diagnostic Steps
+1. Review generated Terraform template: `main.tf`.
+2. Compare declared container resources against active Docker SDK inventory.
+3. Validate HCL syntax and ensure manual operator review disclaimer is present.
+
+### Remediation Actions
+1. **Generate Clean HCL Template:** Synexis Artifact Generator outputs validated HCL template.
+2. **Operator Manual Review:** SRE operator inspects and verifies template variables.
+3. **Deploy via Standard CI/CD:** Apply via controlled IaC pipeline with manual approval gates.""",
     },
 ]
 

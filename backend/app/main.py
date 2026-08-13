@@ -22,6 +22,9 @@ from backend.app.api.routes_chaos import router as chaos_router
 from backend.app.api.routes_remediation import router as remediation_router
 from backend.app.api.routes_assistant import router as assistant_router
 from backend.app.api.routes_environments import router as environments_router
+from backend.app.api.routes_artifacts import router as artifacts_router
+from backend.app.api.routes_kubernetes import router as kubernetes_router
+from backend.app.api.routes_simulation import router as simulation_router
 
 
 # ── Unified background telemetry loop ─────────────────────────────────────────
@@ -81,6 +84,9 @@ app.include_router(chaos_router,         prefix=api_prefix)
 app.include_router(remediation_router,   prefix=api_prefix)
 app.include_router(assistant_router,     prefix=api_prefix)
 app.include_router(environments_router,  prefix=api_prefix)
+app.include_router(artifacts_router,     prefix=api_prefix)
+app.include_router(kubernetes_router,    prefix=api_prefix)
+app.include_router(simulation_router,    prefix=api_prefix)
 
 
 @app.get("/")

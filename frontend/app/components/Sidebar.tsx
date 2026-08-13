@@ -25,6 +25,7 @@ export type NavTab =
   | "incidents"
   | "containers"
   | "data_sources"
+  | "artifacts"
   | "config"
   | "remediation"
   | "chaos"
@@ -77,6 +78,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         activeIncidentsCount > 0
           ? "bg-rose-100 text-rose-600 font-bold"
           : undefined,
+    },
+    {
+      id: "artifacts",
+      label: "Config Artifacts",
+      icon: BookOpen,
+      group: "Intelligence & RAG",
+      tag: "K8s/IaC",
     },
     // Infrastructure
     { id: "containers", label: "Docker Containers", icon: Boxes, group: "Infrastructure" },

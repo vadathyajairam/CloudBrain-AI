@@ -24,6 +24,7 @@ const ENV_ICONS: Record<string, React.ElementType> = {
   ai_provider: Bot,
   rag: BookOpen,
   kubernetes: Layers,
+  simulated_cloud: Cloud,
   aws: Cloud,
   azure: Cloud,
   gcp: Cloud,

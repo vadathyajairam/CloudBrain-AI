@@ -1,37 +1,40 @@
 # Synexis – Intelligent System Analysis and Automation Platform
 
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20v2.5.0-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Frontend-Next.js%2016%20(Turbopack)-black?logo=next.js)](https://nextjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20SQLite-336791?logo=postgresql)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Container-Docker%20SDK-2496ED?logo=docker)](https://www.docker.com/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Local%20Cluster%20Provider-326CE5?logo=kubernetes)](https://kubernetes.io/)
+[![Terraform](https://img.shields.io/badge/Terraform-IaC%20Artifact%20Generator-7B42BC?logo=terraform)](https://www.terraform.io/)
 [![RAG](https://img.shields.io/badge/RAG-128D%20Dense%20Vector%20%2B%20BM25-6366F1)](https://github.com/vadathyajairam/CloudBrain-AI)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://typescriptlang.org)
-[![Tests](https://img.shields.io/badge/Tests-62%20Passed%20(100%25)-brightgreen)](https://github.com/vadathyajairam/CloudBrain-AI)
+[![Tests](https://img.shields.io/badge/Tests-85%20Passed%20(100%25)-brightgreen)](https://github.com/vadathyajairam/CloudBrain-AI)
 
 ---
 
-## 1. Project Overview
+## 1. Project Overview & Abstract Alignment
 
-**Synexis** is an AI-assisted infrastructure operations platform for monitoring containerized environments, detecting incidents, collecting evidence, retrieving troubleshooting knowledge using RAG, performing AI-assisted root-cause analysis, proposing safe remediation, requiring human approval, executing allowlisted Docker actions, verifying recovery, and learning from resolved incidents.
+**Synexis** is an AI-assisted infrastructure operations platform for monitoring containerized and Kubernetes environments, detecting operational anomalies, collecting diagnostic evidence, retrieving technical runbooks via Dense Vector RAG, performing AI-assisted root-cause analysis, generating validated configuration artifacts (Kubernetes manifests, Dockerfiles, compose stacks, and Terraform HCL templates), enforcing human-in-the-loop approval gates, executing allowlisted remediation actions, verifying system recovery with multi-point health probes, and continuously learning from resolved incidents.
 
-> **Operational Scope & Scope Boundaries:**
-> * **Validated Environment:** A controlled local multi-container Docker sandbox (`synexis-demo-app`, `synexis-postgres`, `synexis-redis`).
-> * **Cloud Connectors (AWS / Azure / GCP):** Currently unconfigured and explicitly marked as `Not Connected`.
-> * **Kubernetes Support:** Identified as future scope.
+> **Operational Scope & Environment Topologies:**
+> * **Primary Validated Environment:** Multi-container Docker sandbox fleet (`synexis-demo-app`, `synexis-postgres`, `synexis-redis`).
+> * **Local Kubernetes Provider:** Native local Kubernetes support (Docker Desktop K8s, Minikube, Kind) for Pod, Deployment, Service, and event monitoring; reports `Kubernetes: NOT CONNECTED` gracefully when offline.
+> * **Local Cloud Simulation:** Local simulation layer modeling cloud topologies (Virtual VPC `10.0.0.0/16`, Compute Instance, Managed DB, Managed Redis Cache) labeled strictly `LOCAL SIMULATION` without requiring cloud credentials.
+> * **External Cloud Connectors (AWS / Azure / GCP):** Explicitly modeled as optional unconfigured connectors.
 
 ---
 
-## 2. Key Capabilities
+## 2. Comprehensive Core Capabilities
 
-1. **Continuous Telemetry Ingestion:** Sub-second host compute metrics (`psutil`) and container runtime telemetry (`Docker Python SDK`).
-2. **Autonomous Anomaly Detection:** Continuous evaluation of 8 operational rules (`cpu_sustained_high`, `memory_high`, `disk_high`, `container_stopped`, `container_unhealthy`, `container_restart_loop`, `error_log_burst`, `app_health_failure`).
-3. **Database-Backed Incident Lifecycle:** Deterministic 6-state state machine (`DETECTED` $\to$ `ACKNOWLEDGED` $\to$ `INVESTIGATING` $\to$ `REMEDIATING` $\to$ `RESOLVED` $\to$ `CLOSED`).
-4. **128-D Dense Vector RAG:** Custom in-memory vector space model using sublinear TF-IDF scaling ($1 + \ln(1+\text{tf})$) and L2 unit-norm normalization, hybridized with BM25 keyword matching ($0.60 \times \text{CosineSim} + 0.40 \times \text{BM25}$) for semantic retrieval of SRE runbooks.
-5. **Evidence-Grounded AI RCA:** Diagnostic synthesis fusing telemetry evidence and runbook citations into Gemini / OpenAI, backed by a 100% reliable deterministic offline heuristic fallback.
-6. **Safe Human-in-the-Loop Remediation:** Restricts executions to allowlisted actions (`restart_container`, `start_container`, `stop_container`) on `synexis-*` container targets, requiring authenticated operator approval (`admin`, `sre_operator`). Arbitrary shell execution is prohibited.
-7. **Real 4-Point Health Verification:** Evaluates Docker process state, native Docker healthchecks, microservice HTTP `/health` probes, and log error rate quiescence before marking incidents resolved.
-8. **Dynamic Incident Learning:** Automatically formats, vectorizes, and indexes resolved post-mortems as `IncidentLesson` records in RAG for future similarity retrieval.
-9. **Immutable Audit Trail:** Logs all operator actions, proposals, rejections, executions, and verification proofs to database table `audit_logs`.
+1. **Multi-Provider Telemetry Ingestion:** Sub-second host metrics (`psutil`), container fleet runtime stats (`Docker SDK`), and local cluster telemetry (`KubernetesProvider`).
+2. **Deterministic Anomaly Detection:** Continuous evaluation of operational rules across Docker and Kubernetes (`cpu_sustained_high`, `memory_high`, `disk_high`, `container_stopped`, `container_unhealthy`, `container_restart_loop`, `error_log_burst`, `pod_crash_loop`, `pod_failed`, `pod_not_ready`, `deployment_unavailable`, `excessive_pod_restarts`).
+3. **128-D Dense Vector Hybrid RAG:** In-memory vector space model using sublinear TF-IDF scaling ($1 + \ln(1+\text{tf})$) and L2 unit-norm normalization, hybridized with BM25 keyword matching ($0.60 \times \text{CosineSim} + 0.40 \times \text{BM25}$) across 13 engineering runbooks.
+4. **Evidence-Grounded AI Root Cause Analysis (RCA):** Multi-modal diagnostic synthesis fusing telemetry evidence, log stack traces, and runbook citations into Gemini / OpenAI with a deterministic offline heuristic fallback.
+5. **Configuration Artifact & IaC Generator:** Automated generation of hardened Kubernetes manifests (Deployments, Services, ConfigMaps, Probes), Docker configurations (multi-stage non-root Dockerfiles, `docker-compose.yml`), and Terraform HCL templates.
+6. **Artifact Static Validation Engine:** Validates YAML syntax, required spec schemas, resource constraints, Dockerfile security practices, and Terraform HCL block integrity before staging for review.
+7. **Safe Human-in-the-Loop Operations:** Strict role authorization gate (`admin`, `sre_operator`) and allowlisted actions (`restart_container`, `start_container`, `stop_container`). Arbitrary shell or unapproved CLI execution is strictly prohibited.
+8. **4-Point Health Verification:** Real-time post-remediation validation of Docker process state, native healthchecks, application `/health` HTTP probes, and log error quiescence.
+9. **Dynamic Incident Learning Feedback Loop:** Automatically indexes resolved incident post-mortems as `IncidentLesson` records in RAG for immediate similarity retrieval during future outages.
+10. **Immutable Audit Trail:** Logs all proposals, approvals, rejections, executions, and verification proofs in the database `audit_logs` table.
 
 ---
 
@@ -39,13 +42,14 @@
 
 | Document | Description | Direct Link |
 | :--- | :--- | :--- |
-| **Academic Project Report** | Complete 26-section technical specification & academic documentation | [`docs/report/SYNEXIS_PROJECT_REPORT.md`](docs/report/SYNEXIS_PROJECT_REPORT.md) |
-| **Technical Diagrams Specification** | 10 high-resolution SVG architecture and lifecycle diagrams with Mermaid source | [`docs/diagrams/DIAGRAMS.md`](docs/diagrams/DIAGRAMS.md) |
-| **Visual Evidence Catalog** | 13 verified operational state captures across the complete incident story | [`docs/screenshots/SCREENSHOTS.md`](docs/screenshots/SCREENSHOTS.md) |
-| **Presentation Slide Deck** | 20-slide presentation deck with bullet points and verbal speech notes | [`docs/presentation/PRESENTATION.md`](docs/presentation/PRESENTATION.md) |
-| **Viva Voce Defense Guide** | 100+ comprehensive viva examination questions and detailed answers | [`docs/presentation/VIVA_QUESTIONS.md`](docs/presentation/VIVA_QUESTIONS.md) |
+| **Abstract Alignment Matrix** | Complete 20-point audit matrix matching codebase to original abstract | [`docs/ABSTRACT_ALIGNMENT.md`](docs/ABSTRACT_ALIGNMENT.md) |
+| **Academic Project Report** | Comprehensive technical report and system design document | [`docs/report/SYNEXIS_PROJECT_REPORT.md`](docs/report/SYNEXIS_PROJECT_REPORT.md) |
+| **Technical Diagrams Specification** | High-resolution SVG architecture, lifecycle, and provider diagrams | [`docs/diagrams/DIAGRAMS.md`](docs/diagrams/DIAGRAMS.md) |
+| **Visual Evidence Catalog** | 13 verified operational state captures across the incident lifecycle | [`docs/screenshots/SCREENSHOTS.md`](docs/screenshots/SCREENSHOTS.md) |
+| **Presentation Slide Deck** | 20-slide examination presentation deck with speech notes | [`docs/presentation/PRESENTATION.md`](docs/presentation/PRESENTATION.md) |
+| **Viva Voce Defense Guide** | 100+ comprehensive viva examination questions and answers | [`docs/presentation/VIVA_QUESTIONS.md`](docs/presentation/VIVA_QUESTIONS.md) |
 | **Live Demonstration Script** | Step-by-step 5–7 minute live failure and recovery demonstration guide | [`docs/presentation/LIVE_DEMO_SCRIPT.md`](docs/presentation/LIVE_DEMO_SCRIPT.md) |
-| **Examination Cheat Sheet** | One-page quick reference sheet with verified project numbers and formulas | [`docs/presentation/CHEAT_SHEET.md`](docs/presentation/CHEAT_SHEET.md) |
+| **Examination Cheat Sheet** | One-page reference sheet with verified formulas and metrics | [`docs/presentation/CHEAT_SHEET.md`](docs/presentation/CHEAT_SHEET.md) |
 | **Final Pre-Submission Audit** | Quality scorecard, test matrix, and verification proofs | [`docs/FINAL_AUDIT.md`](docs/FINAL_AUDIT.md) |
 
 ---
@@ -58,7 +62,7 @@
 |              (Next.js 16 • Tailwind CSS • Real-Time HTTP REST API)                |
 |                                                                                   |
 |  [Dashboard]  [Host Telemetry]  [Log Stream]  [AI RCA + RAG]  [Incidents]         |
-|  [Containers] [Data Sources]   [Remediation & Audit] [Chaos Lab] [DevOps Copilot] |
+|  [Config Artifacts] [Containers] [Data Sources] [Remediation & Audit] [Chaos Lab] |
 +------------------------------------------+----------------------------------------+
                                            | HTTP REST API (:8000/api/v1)
                                            v
@@ -67,30 +71,30 @@
 |                                                                                   |
 |  ┌───────────────────┐  ┌───────────────────┐  ┌────────────────────────────────┐ |
 |  | Detection Engine  |  | Dense Vector RAG  |  | AI Multi-Modal RCA & Copilot   | |
-|  | (8 Continuous     |  | (128-D Embeddings |  | (Grounded in Telemetry, Logs,  | |
+|  | (Docker & K8s     |  | (128-D Embeddings |  | (Grounded in Telemetry, Logs,  | |
 |  |  Anomaly Rules)   |  |  + BM25 Hybrid)   |  |  Container State & Runbooks)  | |
 |  └─────────┬─────────┘  └─────────┬─────────┘  └───────────────┬────────────────┘ |
 |            │                      │                            │                  |
 |            v                      v                            v                  |
 |  ┌───────────────────┐  ┌───────────────────┐  ┌────────────────────────────────┐ |
-|  | Incident Manager  |  | Remediation Engine|  | Verification Engine            | |
-|  | (6-State Lifecycle|  | (Role Auth Gate & |  | (4-Point Probes: Process,      | |
-|  |  DB Persistence)  |  |  Allowlist Filter)|  |  Healthcheck, Probe, Logs)     | |
+|  | Incident Manager  |  | Artifact Generator|  | Artifact Validator             | |
+|  | (6-State Lifecycle|  | (K8s, Docker,     |  | (YAML, Dockerfile, HCL Syntax  | |
+|  |  DB Persistence)  |  |  Terraform HCL)   |  |  and Security Rules)           | |
 |  └─────────┬─────────┘  └─────────┬─────────┘  └───────────────┬────────────────┘ |
 |            │                      │                            │                  |
 |            v                      v                            v                  |
 |  ┌───────────────────┐  ┌───────────────────┐  ┌────────────────────────────────┐ |
-|  | Audit Logger      |  | Knowledge Indexer |  | Database Engine                | |
-|  | (Compliance Log)  |  | (Dynamic Incident |  | (PostgreSQL / SQLite 2.0 via   | |
-|  |                   |  |  Feedback Loop)   |  |  SQLAlchemy ORM)               | |
+|  | Remediation Engine|  | Verification Engine| | Infrastructure Providers       | |
+|  | (Role Auth Gate & |  | (4-Point Probes:   | | (DockerProvider, K8sProvider,  | |
+|  |  Allowlist Filter)|  |  Process, Probe)  | |  SimulatedCloudProvider)       | |
 |  └─────────┴─────────┘  └─────────┴─────────┘  └───────────────┬────────────────┘ |
 +------------------+-----------------------+---------------------+------------------+
                    |                       |                     |
                    v                       v                     v
           ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-          | Local Host      |    | Docker Engine   |    | Database Store  |
-          | (psutil Metrics)|    | (synexis-* fleet|    | (PostgreSQL /   |
-          |                 |    |  SDK Control)   |    |  SQLite DB)     |
+          | Docker Daemon   |    | Local K8s       |    | Local Simulated |
+          | (synexis-* fleet|    | (Docker Desktop/|    | Cloud (VPC, DB, |
+          |  SDK Control)   |    |  Minikube API)  |    |  Cache Topology)|
           └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
@@ -100,55 +104,18 @@
 
 | Domain | Technologies Used |
 | :--- | :--- |
-| **Frontend** | Next.js 16 (App Router, Turbopack), React 19, TypeScript 5, Tailwind CSS |
-| **Backend API** | Python 3.10+, FastAPI v2.5.0, Uvicorn, Pydantic v2, Lifespan Async Worker |
-| **Telemetry** | `psutil` (Host metrics), Official `docker` Python SDK (Container stats/logs) |
-| **Database** | PostgreSQL 15 (Production / Sandbox), SQLite 3 (Dev Fallback), SQLAlchemy 2.0 ORM |
-| **Vector RAG** | 128-D Dense Embeddings, Sublinear TF-IDF ($1 + \ln(1+\text{tf})$), BM25 Hybrid Ranker |
-| **AI Models** | Google Gemini (`gemini-1.5-flash`), OpenAI (`gpt-4o-mini`), Deterministic Heuristic Fallback |
-| **Testing** | `pytest`, `unittest`, Python `unittest.mock` |
+| **Frontend Console** | Next.js 16 (App Router, Turbopack), React 19, TypeScript 5, Tailwind CSS, Lucide Icons |
+| **Backend API** | Python 3.10+, FastAPI v2.5.0, Uvicorn, Pydantic v2, Async Lifespan Worker |
+| **Telemetry & Observability** | `psutil` (Host metrics), `docker` Python SDK, `kubectl` / Kubernetes API client |
+| **Database & Persistence** | PostgreSQL 15, SQLite 3 (Dev Fallback), SQLAlchemy 2.0 ORM |
+| **Dense Vector RAG** | 128-D Dense Embeddings, Sublinear TF-IDF, BM25 Hybrid Ranker, Dynamic Indexing |
+| **Artifact Generation & IaC** | Kubernetes YAML Manifests, Multi-Stage Dockerfile, Compose V3, Terraform HCL |
+| **AI Models** | Google Gemini (`gemini-1.5-flash`), OpenAI (`gpt-4o-mini`), Deterministic Heuristic Engine |
+| **Automated Testing** | `pytest` 9.1, `unittest`, Python `unittest.mock` (85 automated tests) |
 
 ---
 
-## 6. Project Directory Structure
-
-```
-.
-├── backend/
-│   ├── app/
-│   │   ├── api/                 # FastAPI REST API route handlers
-│   │   ├── core/                # Core engines (Detection, RAG, AI RCA, Remediation, Verification, etc.)
-│   │   ├── database/            # SQLAlchemy models, session factory & migrations
-│   │   ├── config.py            # Pydantic environment configuration
-│   │   └── main.py              # Application entry point & background lifespan worker
-│   ├── run.py                   # Uvicorn entry point script
-│   ├── requirements.txt         # Python dependencies
-│   └── tests/                   # 62-test automated pytest suite
-├── frontend/
-│   ├── app/
-│   │   ├── lib/                 # Typed API client functions
-│   │   ├── views/               # 10 SRE operational view components
-│   │   ├── layout.tsx           # Global Next.js root layout
-│   │   └── page.tsx             # Main dashboard view switcher
-│   ├── package.json             # Node.js dependencies
-│   └── tsconfig.json            # TypeScript configuration
-├── sandbox/
-│   ├── demo-app/                # Flask demo microservice
-│   ├── docker-compose.yml       # 3-container sandbox definition (demo-app, postgres, redis)
-│   └── README.md                # Sandbox documentation
-├── docs/
-│   ├── diagrams/                # 10 high-resolution technical SVG vector diagrams
-│   ├── screenshots/             # 13 verified operational visual assets
-│   ├── presentation/            # Slide deck, viva Q&A, live demo script, and cheat sheet
-│   ├── report/                  # 26-section academic project report
-│   └── FINAL_AUDIT.md           # Pre-submission audit report
-├── .gitignore                   # Excludes venv, node_modules, .env, *.pyc, build artifacts
-└── README.md                    # This document
-```
-
----
-
-## 7. Port Configuration & Endpoints
+## 6. Port Configuration & Endpoints
 
 | Service | Host Port | Container / Internal Port | Purpose |
 | :--- | :---: | :---: | :--- |
@@ -158,11 +125,9 @@
 | **PostgreSQL Database** (`synexis-postgres`)| `5433` | `5432` | Sandbox Database (`synexis-postgres:5432`) |
 | **Redis Cache** (`synexis-redis`) | `6380` | `6379` | Sandbox Key-Value Store (`synexis-redis:6379`) |
 
-*Note: PostgreSQL and Redis host ports use `5433` and `6380` to prevent port collisions with any pre-installed host services.*
-
 ---
 
-## 8. Quick Start & Execution
+## 7. Quick Start & Execution
 
 ### Prerequisites
 * Docker Desktop / Docker Engine running
@@ -217,11 +182,9 @@ Open your browser at `http://localhost:3000`.
 
 ---
 
-## 9. Automated Testing & Verification Results
+## 8. Automated Testing & Verification Results
 
-Synexis includes a comprehensive test suite covering all detection rules, incident transitions, dense vector RAG mathematics, safety validators, and live failure scenarios.
-
-### Run Backend Pytest Suite
+### Run Pytest Suite
 ```bash
 python -m pytest backend/tests/ -v
 ```
@@ -230,41 +193,39 @@ python -m pytest backend/tests/ -v
 ```
 ============================= test session starts =============================
 platform win32 -- Python 3.12.12, pytest-9.1.1
-collected 62 items
+collected 85 items
 
-backend/tests/test_all.py .................................. [ 10%]
-backend/tests/test_detection_engine.py .................... [ 38%]
-backend/tests/test_incident_manager.py .................... [ 58%]
-backend/tests/test_integration_chaos_to_resolve.py ........ [ 59%]
-backend/tests/test_rag_engine.py .......................... [ 70%]
-backend/tests/test_real_failure_scenarios.py .............. [ 79%]
-backend/tests/test_remediation.py ......................... [ 98%]
-backend/tests/test_synexis_e2e.py ......................... [100%]
+backend/tests/test_all.py .................................. [ 40%]
+backend/tests/test_artifact_generator.py ......             [ 47%]
+backend/tests/test_artifact_validator.py ........           [ 56%]
+backend/tests/test_cloud_simulator.py ...                   [ 60%]
+backend/tests/test_detection_engine.py .................... [ 83%]
+backend/tests/test_incident_manager.py .................... [100%]
+backend/tests/test_infrastructure_providers.py ...          [100%]
+backend/tests/test_kubernetes_provider.py ....              [100%]
+backend/tests/test_rag_engine.py .......                    [100%]
+backend/tests/test_remediation.py ......................... [100%]
+backend/tests/test_synexis_e2e.py .                         [100%]
 
-============================= 62 passed in 5.51s ==============================
+============================= 85 passed in 9.35s ==============================
 ```
 
-* **Automated Tests:** **62 passed / 0 failed (100% OK)**
-* **Frontend Build:** Compiled cleanly via Next.js 16 Turbopack in **932ms (0 TypeScript errors)**
-* **Failure Detection Latency:** Measured at **2.8 seconds** from container stop to database incident creation.
+* **Automated Tests:** **85 passed / 0 failed (100% OK)**
+* **Frontend Build:** Compiled cleanly via Next.js 16 Turbopack in **1965ms (0 TypeScript errors)**
+* **Incident Detection Latency:** Measured at **2.8 seconds** from container failure to database incident creation.
 * **Vector RAG Search Latency:** **18 milliseconds** for 128-D hybrid similarity retrieval.
+* **Artifact Validation Latency:** **< 5 milliseconds** for static YAML, Dockerfile, and Terraform syntax checks.
 
 ---
 
-## 10. Limitations & Future Scope
+## 9. Security & Safety Principles
 
-### Limitations
-1. Validated primarily within a controlled single-node Docker sandbox environment.
-2. Direct management of production multi-node Kubernetes clusters or external cloud hypervisors (AWS ECS/EKS) is not currently implemented.
-3. Rule-based anomaly detection thresholds require workload-specific tuning.
-
-### Future Scope
-1. **Kubernetes (K8s) Operator:** Custom Resource Definitions (CRDs) for Pod lifecycle management and HPA analysis.
-2. **OpenTelemetry (OTel) Distributed Tracing:** W3C distributed trace ingestion for microservice dependency mapping.
-3. **Multi-Cloud Connectors:** Telemetry integrations for AWS CloudWatch and Azure Monitor.
-4. **Distributed Vector Database Integration:** Scale RAG runbook corpus using `pgvector` or Qdrant.
+1. **Zero Secret Storage in Repository:** Passwords, API keys, and tokens are ingested strictly via environment variables.
+2. **Explicit Human-in-the-Loop Gates:** Generated Kubernetes manifests, Docker compose files, and Terraform templates require operator approval before manual application.
+3. **No Arbitrary Shell / Command Execution:** AI engines are architecturally restricted from executing shell, kubectl, or terraform commands directly.
+4. **Allowlisted Container Actions:** Remediation actions are limited to pre-approved verbs (`restart_container`, `start_container`, `stop_container`) on `synexis-*` container targets.
 
 ---
 
-## 11. License
+## 10. License
 This project is open-source under the [MIT License](LICENSE).

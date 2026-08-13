@@ -383,4 +383,105 @@ export const api = {
     const res = await fetch(`${API_BASE}/chat/clear`, { method: "POST" });
     return res.json();
   },
+
+  // ── Configuration Artifacts ────────────────────────────────
+  async getArtifacts(): Promise<{ count: number; artifacts: any[] }> {
+    const res = await fetch(`${API_BASE}/artifacts/`, { cache: "no-store" });
+    return res.json();
+  },
+
+  async generateArtifact(data: {
+    artifact_type: string;
+    service_name: string;
+    template_subtype?: string;
+    incident_id?: string;
+    rag_source_id?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/artifacts/generate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return res.json();
+  },
+
+  async validateArtifact(artifactId: string) {
+    const res = await fetch(`${API_BASE}/artifacts/${artifactId}/validate`, {
+      method: "POST",
+    });
+    return res.json();
+  },
+
+  async approveArtifact(artifactId: string, operator_name: string = "sre_operator") {
+    const res = await fetch(`${API_BASE}/artifacts/${artifactId}/approve`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ operator_name, role: "admin" }),
+    });
+    return res.json();
+  },
+
+  async rejectArtifact(artifactId: string, operator_name: string = "sre_operator") {
+    const res = await fetch(`${API_BASE}/artifacts/${artifactId}/reject`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ operator_name, role: "admin" }),
+    });
+    return res.json();
+  },
+
+  // ── Kubernetes Monitoring ──────────────────────────────────
+  async getK8sStatus() {
+    const res = await fetch(`${API_BASE}/k8s/status`, { cache: "no-store" });
+    return res.json();
+  },
+
+  async getK8sPods(namespace: string = "default") {
+    const res = await fetch(`${API_BASE}/k8s/pods?namespace=${namespace}`, { cache: "no-store" });
+    return res.json();
+  },
+
+  async getK8sDeployments(namespace: string = "default") {
+    const res = await fetch(`${API_BASE}/k8s/deployments?namespace=${namespace}`, { cache: "no-store" });
+    return res.json();
+  },
+
+  async getK8sServices(namespace: string = "default") {
+    const res = await fetch(`${API_BASE}/k8s/services?namespace=${namespace}`, { cache: "no-store" });
+    return res.json();
+  },
+
+  async getK8sAnomalies(namespace: string = "default") {
+    const res = await fetch(`${API_BASE}/k8s/anomalies?namespace=${namespace}`, { cache: "no-store" });
+    return res.json();
+  },
+
+  // ── Cloud Simulation ───────────────────────────────────────
+  async getSimulationStatus() {
+    const res = await fetch(`${API_BASE}/simulation/status`, { cache: "no-store" });
+    return res.json();
+  },
+
+  async getSimulatedResources() {
+    const res = await fetch(`${API_BASE}/simulation/resources`, { cache: "no-store" });
+    return res.json();
+  },
+
+  async injectSimulationFailure(resource_id: string) {
+    const res = await fetch(`${API_BASE}/simulation/inject`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resource_id }),
+    });
+    return res.json();
+  },
+
+  async recoverSimulationResource(resource_id: string) {
+    const res = await fetch(`${API_BASE}/simulation/recover`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resource_id }),
+    });
+    return res.json();
+  },
 };
