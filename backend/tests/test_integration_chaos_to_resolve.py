@@ -62,7 +62,7 @@ class TestFullChaosToResolvePipeline:
         }
         mock_ai_container_engine.list_containers.return_value = [
             {
-                "name": "cloudbrain-postgres",
+                "name": "synexis-postgres",
                 "status": "exited",
                 "state": "exited",
                 "cpu_percent": 0.0,
@@ -78,7 +78,7 @@ class TestFullChaosToResolvePipeline:
         }
         mock_log_engine.get_logs.return_value = [
             {"timestamp": "2026-01-01 00:00:00", "level": "ERROR",
-             "service": "cloudbrain-demo-app", "message": "connection refused to postgres"}
+             "service": "synexis-demo-app", "message": "connection refused to postgres"}
         ]
 
         # ── 2. Detection engine fires ──────────────────────────────────────
@@ -86,14 +86,14 @@ class TestFullChaosToResolvePipeline:
             rule_id="container_stopped",
             triggered=True,
             severity="CRITICAL",
-            title="Container Stopped — cloudbrain-postgres",
-            description="Container 'cloudbrain-postgres' is stopped.",
-            service="cloudbrain-postgres",
+            title="Container Stopped — synexis-postgres",
+            description="Container 'synexis-postgres' is stopped.",
+            service="synexis-postgres",
             container_id="pg001",
             evidence=[
                 EvidenceItem(
                     evidence_type="CONTAINER",
-                    source="cloudbrain-postgres",
+                    source="synexis-postgres",
                     detail="Container status: exited"
                 )
             ],
@@ -127,7 +127,7 @@ class TestFullChaosToResolvePipeline:
         rem_engine = RemediationEngine()
         proposal = rem_engine.propose_action(
             action_type="start_container",
-            target="cloudbrain-postgres",
+            target="synexis-postgres",
             reason="Container stopped — starting it",
             incident_id=incident_id,
             proposed_by="user",
@@ -137,11 +137,11 @@ class TestFullChaosToResolvePipeline:
         # ── 7. User approves + execute ────────────────────────────────────
         mock_rem_docker.start_container.return_value = {
             "status": "success",
-            "message": "Container 'cloudbrain-postgres' started",
+            "message": "Container 'synexis-postgres' started",
         }
         mock_verifier.verify.return_value = VerificationResult(
             passed=True,
-            summary="All 5 checks passed. Container 'cloudbrain-postgres' is healthy.",
+            summary="All 5 checks passed. Container 'synexis-postgres' is healthy.",
             checks=[
                 VerificationCheck("Container Process State", "PASSED", "Status: RUNNING"),
                 VerificationCheck("Docker Health Check",    "PASSED", "State: HEALTHY"),

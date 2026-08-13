@@ -74,7 +74,7 @@ Synexis introduces a fully integrated, safe, evidence-grounded operational loop:
 ```
 +-----------------------------------------------------------------------------------+
 |                            SYNEXIS WEB CONSOLE                                    |
-|              (Next.js 16 • Tailwind CSS • Live WebSocket / REST)                  |
+|              (Next.js 16 • Tailwind CSS • Real-Time HTTP REST API)                |
 |                                                                                   |
 |  [Dashboard]  [Host Telemetry]  [Log Stream]  [AI RCA + RAG]  [Incidents]         |
 |  [Containers] [Data Sources]   [Remediation & Audit] [Chaos Lab] [DevOps Copilot] |
@@ -211,7 +211,7 @@ Real Incident Triggered (Rule ID, Service Name, Container ID)
                              ↓
                   Safety Policy Validator
    • Action Type in Allowlist (restart_container, start_container, stop_container)
-   • Target in Sandbox Allowlist (synexis-* / cloudbrain-*)
+   • Target in Sandbox Allowlist (synexis-*)
    • Target contains only alphanumeric/hyphen characters
                              ↓
                    Pending Remediation Queue
@@ -296,16 +296,23 @@ Monitored containers:
 ### Step 1: Start Backend Server
 
 ```bash
-cd backend
-python -m venv venv
+# Create and activate virtual environment from project root:
 
-# Windows:
-.\venv\Scripts\activate
-# Linux/macOS:
+# Windows PowerShell:
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+
+# Windows Command Prompt:
+python -m venv venv
+.\venv\Scripts\activate.bat
+
+# Linux / macOS:
+python3 -m venv venv
 source venv/bin/activate
 
-pip install -r requirements.txt
-python run.py
+# Install dependencies and start server:
+pip install -r backend/requirements.txt
+python backend/run.py
 ```
 *Backend API will run at `http://127.0.0.1:8000` with Swagger docs at `http://127.0.0.1:8000/docs`.*
 
@@ -371,7 +378,7 @@ backend/tests/test_synexis_e2e.py ......................... [100%]
 
 1. **Local Boundary:** Container management is currently focused on single-node Docker engines and Docker Desktop environments.
 2. **Deterministic Fallback Scope:** In environments without external LLM API keys, RCA relies on pattern-matching expert rules rather than generative synthesis.
-3. **Container Name Conformance:** Monitored sandbox containers must conform to the allowed prefix pattern (`synexis-*` / `cloudbrain-*`).
+3. **Container Name Conformance:** Monitored sandbox containers must conform to the allowed prefix pattern (`synexis-*`).
 
 ---
 

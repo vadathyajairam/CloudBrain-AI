@@ -58,7 +58,7 @@ def _validate_action(action_type: str, target: str) -> None:
         raise SafetyValidationError(
             f"Action '{action_type}' is not permitted. Allowed actions: {list(ALLOWED_ACTIONS.keys())}"
         )
-    if not (target.startswith("synexis-") or target.startswith("cloudbrain-")):
+    if not target.startswith("synexis-"):
         raise SafetyValidationError(
             f"Target '{target}' is outside the authorized sandbox container boundary."
         )

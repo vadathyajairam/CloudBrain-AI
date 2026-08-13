@@ -30,7 +30,7 @@ class TestSafetyValidator:
     def test_valid_action_passes(self):
         # Should not raise
         _validate_action("restart_container", "synexis-demo-app")
-        _validate_action("restart_container", "cloudbrain-demo-app")
+        _validate_action("restart_container", "synexis-postgres")
 
     def test_invalid_action_type_raises(self):
         with pytest.raises(SafetyValidationError, match="not permitted"):

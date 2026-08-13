@@ -268,7 +268,7 @@ User Question: {user_msg}"""
             if not containers:
                 reply_content = (
                     "### 🐳 Docker Sandbox Telemetry\n\n"
-                    "Currently, **Docker is offline** or no `synexis-*` / `cloudbrain-*` containers were discovered. "
+                    "Currently, **Docker is offline** or no `synexis-*` containers were discovered. "
                     "Start Docker Desktop and launch the sandbox (`cd sandbox && docker compose up -d`) to enable live container tracking."
                 )
             else:

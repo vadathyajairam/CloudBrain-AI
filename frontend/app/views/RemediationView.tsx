@@ -92,7 +92,7 @@ export const RemediationView: React.FC = () => {
             Synexis Authorization & Safety Protocol Active
           </div>
           <p className="text-xs text-slate-600 leading-relaxed max-w-2xl">
-            LLMs cannot execute raw arbitrary shell commands. All suggested fixes require authenticated operator review, container allowlist verification (<code>synexis-*</code> / <code>cloudbrain-*</code>), and mandatory post-action health checks.
+            LLMs cannot execute raw arbitrary shell commands. All suggested fixes require authenticated operator review, container allowlist verification (<code>synexis-*</code>), and mandatory post-action health checks.
           </p>
         </div>
 

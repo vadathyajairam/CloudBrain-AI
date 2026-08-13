@@ -20,7 +20,7 @@ router = APIRouter(prefix="/remediate", tags=["Remediation & Safety"])
 
 class ProposeActionRequest(BaseModel):
     action_type: str       # restart_container | start_container | stop_container
-    target: str            # must start with "synexis-" or "cloudbrain-"
+    target: str            # must start with "synexis-"
     reason: str
     incident_id: Optional[str] = None
     proposed_by: str = "ai_rca_engine"

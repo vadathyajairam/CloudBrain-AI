@@ -28,7 +28,7 @@ try:
 except Exception:
     DOCKER_AVAILABLE = False
 
-ALLOWED_PREFIXES = getattr(settings, "ALLOWED_CONTAINER_PREFIXES", ["synexis-", "cloudbrain-"])
+ALLOWED_PREFIXES = getattr(settings, "ALLOWED_CONTAINER_PREFIXES", ["synexis-"])
 
 # ── Secret key patterns — values matching these will be redacted ──────────────
 _SECRET_KEYS = {"PASSWORD", "SECRET", "KEY", "TOKEN", "AUTH", "CREDENTIAL", "PWD"}

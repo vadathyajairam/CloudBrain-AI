@@ -31,7 +31,7 @@ class Settings(BaseModel):
     # ── Sandbox ───────────────────────────────────────────
     SANDBOX_DEMO_URL: str = os.getenv("SANDBOX_DEMO_URL", "http://localhost:5050")
     SANDBOX_CONTAINER_PREFIX: str = "synexis-"
-    ALLOWED_CONTAINER_PREFIXES: list[str] = ["synexis-", "cloudbrain-"]
+    ALLOWED_CONTAINER_PREFIXES: list[str] = ["synexis-"]
 
     # ── AI Engines (Optional) ─────────────────────────────
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")

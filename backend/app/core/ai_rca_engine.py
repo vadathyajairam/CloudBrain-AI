@@ -141,7 +141,7 @@ Your task: analyze the collected evidence grounded in the RAG knowledge and resp
   "structured_actions": [
     {
       "action": "<one of: restart_container, start_container, stop_container>",
-      "target": "<target container name starting with synexis- or cloudbrain->",
+      "target": "<target container name starting with synexis->",
       "reason": "<why this action resolves the issue>"
     }
   ]
@@ -149,7 +149,7 @@ Your task: analyze the collected evidence grounded in the RAG knowledge and resp
 
 STRICT SAFETY RULES:
 - Only recommend actions from the allowlist: restart_container, start_container, stop_container.
-- Targets MUST start with 'synexis-' or 'cloudbrain-'.
+- Targets MUST start with 'synexis-'.
 - Never execute shell commands directly.
 - Base confidence strictly on evidence strength. Do not invent arbitrary high confidence when evidence is missing.
 - Respond with pure JSON only, no markdown code fence wrapping if possible."""
@@ -328,7 +328,7 @@ class AIRCAEngine:
             act_target = action.get("target", "")
             if (
                 act_type in ALLOWED_ACTIONS
-                and (act_target.startswith("synexis-") or act_target.startswith("cloudbrain-"))
+                and act_target.startswith("synexis-")
             ):
                 safe_actions.append(action)
 

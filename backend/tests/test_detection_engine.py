@@ -19,7 +19,7 @@ def _make_metrics(cpu=10.0, memory=50.0, disk=60.0):
     }
 
 
-def _make_container(name="cloudbrain-test", status="running", state="healthy", restart=0, cpu=5.0, mem=100.0):
+def _make_container(name="synexis-test", status="running", state="healthy", restart=0, cpu=5.0, mem=100.0):
     return {
         "id": "abc123",
         "name": name,

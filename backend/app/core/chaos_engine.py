@@ -159,14 +159,8 @@ class ChaosEngine:
         elif action == "docker_stop":
             target = scenario["target_service"]
             try:
-                # Try target or cloudbrain- fallback
-                try:
-                    container_engine.stop_container(target)
-                    result_detail = f"Container '{target}' stopped via Docker SDK."
-                except Exception:
-                    alt_target = target.replace("synexis-", "cloudbrain-")
-                    container_engine.stop_container(alt_target)
-                    result_detail = f"Container '{alt_target}' stopped via Docker SDK."
+                container_engine.stop_container(target)
+                result_detail = f"Container '{target}' stopped via Docker SDK."
             except Exception as exc:
                 result_detail = f"Docker stop attempted: {exc}"
 
@@ -202,13 +196,8 @@ class ChaosEngine:
             target = prev_scenario.get("target_service", "")
             if target:
                 try:
-                    try:
-                        container_engine.start_container(target)
-                        results.append(f"Container '{target}' started.")
-                    except Exception:
-                        alt_target = target.replace("synexis-", "cloudbrain-")
-                        container_engine.start_container(alt_target)
-                        results.append(f"Container '{alt_target}' started.")
+                    container_engine.start_container(target)
+                    results.append(f"Container '{target}' started.")
                 except Exception as exc:
                     results.append(f"Could not start '{target}': {exc}")
 

@@ -105,7 +105,7 @@ export const ContainersView: React.FC<ContainersViewProps> = ({ containers, onRe
           <div className="text-4xl">🐳</div>
           <h3 className="text-base font-bold text-slate-800">Docker Engine Disconnected</h3>
           <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-            Docker Desktop is offline or no <code>synexis-*</code> / <code>cloudbrain-*</code> sandbox containers were found. Start Docker Desktop and launch the sandbox cluster to begin live container tracking.
+            Docker Desktop is offline or no <code>synexis-*</code> sandbox containers were found. Start Docker Desktop and launch the sandbox cluster to begin live container tracking.
           </p>
           <div className="pt-2">
             <button
