@@ -45,8 +45,9 @@ function Sparkline({
   width?: number;
 }) {
   if (data.length < 2) {
-    const wave = [40, 45, 42, 48, 44, 50, 47, 52, 48, 50];
-    return <Sparkline data={wave} color={color} height={height} width={width} />;
+    // Show genuine flat baseline until telemetry points accumulate
+    const baseline = data.length === 1 ? [data[0], data[0]] : [0, 0];
+    return <Sparkline data={baseline} color={color} height={height} width={width} />;
   }
   const max = Math.max(...data, 0.01);
   const min = Math.min(...data);

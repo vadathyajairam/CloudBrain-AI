@@ -287,6 +287,43 @@ class RemediationEngine:
         except Exception:
             return []
 
+    def reject_action(
+        self,
+        action_id: str,
+        rejected_by: str = "admin",
+        role: str = "admin",
+        reason: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Reject a PENDING remediation action. Ensures no Docker action executes.
+        """
+        _authorize_user(rejected_by, role)
+
+        with db_session() as db:
+            action = db.get(RemediationAction, action_id)
+            if not action:
+                raise ValueError(f"Action '{action_id}' not found.")
+            if action.status != "PENDING":
+                raise ValueError(f"Action '{action_id}' is already '{action.status}' and cannot be rejected.")
+
+            action.status = "REJECTED"
+            action.executed_at = datetime.now(timezone.utc)
+            action.result = {"status": "rejected", "reason": reason or "Operator rejected remediation."}
+            db.commit()
+            action_dict = action.to_dict()
+
+        audit_logger.log(
+            action="remediation.reject",
+            target=action_dict.get("target"),
+            actor=rejected_by,
+            role=role,
+            reason=reason or action_dict.get("reason"),
+            details={"action_id": action_id, "action_type": action_dict.get("action_type")},
+            result="REJECTED",
+        )
+
+        return action_dict
+
     def get_action(self, action_id: str) -> Optional[Dict[str, Any]]:
         try:
             with db_session() as db:

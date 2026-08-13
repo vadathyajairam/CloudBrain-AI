@@ -345,6 +345,15 @@ export const api = {
     return res.json();
   },
 
+  async rejectRemediation(actionId: string, rejectedBy = "admin", role = "admin") {
+    const res = await fetch(`${API_BASE}/remediate/${actionId}/reject`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ approved_by: rejectedBy, role }),
+    });
+    return res.json();
+  },
+
   async getRemediationActions(): Promise<{ total: number; actions: RemediationActionItem[]; pending: RemediationActionItem[] }> {
     const res = await fetch(`${API_BASE}/remediate/actions`, { cache: "no-store" });
     return res.json();

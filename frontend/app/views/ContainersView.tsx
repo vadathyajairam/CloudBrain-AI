@@ -13,7 +13,9 @@ import {
   AlertTriangle,
   Server,
   FileText,
-  X
+  X,
+  LayoutList,
+  LayoutGrid
 } from "lucide-react";
 import { ContainerInfo, LogEntry, api } from "../lib/api";
 
@@ -27,6 +29,7 @@ export const ContainersView: React.FC<ContainersViewProps> = ({ containers, onRe
   const [selectedContainer, setSelectedContainer] = useState<ContainerInfo | null>(null);
   const [containerLogs, setContainerLogs] = useState<LogEntry[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
   const fetchContainerLogs = async (c: ContainerInfo) => {
     setLogsLoading(true);
@@ -60,46 +63,66 @@ export const ContainersView: React.FC<ContainersViewProps> = ({ containers, onRe
       else if (action === "stop") await api.stopContainer(id);
       else if (action === "start") await api.startContainer(id);
       await onRefresh();
-      if (selectedContainer && selectedContainer.id === id) {
-        const updated = containers.find((item) => item.id === id);
-        if (updated) {
-          setSelectedContainer(updated);
-          fetchContainerLogs(updated);
-        }
-      }
+    } catch (e: any) {
+      alert(`Container action failed: ${e.message}`);
     } finally {
       setActionLoadingId(null);
     }
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6 max-w-7xl mx-auto p-6 animate-fadeIn">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <Boxes className="w-5 h-5 text-cyan-400" />
+          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <Boxes className="w-5 h-5 text-indigo-600" />
             Docker & Container Infrastructure Cluster
           </h2>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500 mt-0.5">
             Real-time container health telemetry, memory ceilings, port bindings, and lifecycle controls
           </p>
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs font-mono text-indigo-300">
+          {/* View mode toggle */}
+          <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+            <button
+              onClick={() => setViewMode("table")}
+              className={`p-1.5 rounded-md text-xs font-semibold flex items-center gap-1 transition-colors ${
+                viewMode === "table" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-800"
+              }`}
+              title="Table View"
+            >
+              <LayoutList className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline text-[11px]">Table</span>
+            </button>
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`p-1.5 rounded-md text-xs font-semibold flex items-center gap-1 transition-colors ${
+                viewMode === "grid" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-800"
+              }`}
+              title="Grid View"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline text-[11px]">Cards</span>
+            </button>
+          </div>
+
+          <span className="px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-mono text-slate-700 font-semibold">
             {containers.filter((c) => c.status === "running").length} / {containers.length} Running
           </span>
           <button
             onClick={onRefresh}
-            className="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-colors"
+            className="p-2 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 transition-colors shadow-xs"
+            title="Refresh containers"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* Containers Grid */}
+      {/* Containers Content */}
       {containers.length === 0 ? (
         <div className="p-12 rounded-2xl bg-white border border-slate-200 text-center space-y-3 shadow-sm">
           <div className="text-4xl">🐳</div>
@@ -117,7 +140,110 @@ export const ContainersView: React.FC<ContainersViewProps> = ({ containers, onRe
             </button>
           </div>
         </div>
+      ) : viewMode === "table" ? (
+        /* ── Professional High-Density SRE Table ── */
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <tr>
+                  <th className="px-4 py-3">Container</th>
+                  <th className="px-4 py-3">Image</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Health</th>
+                  <th className="px-4 py-3">CPU</th>
+                  <th className="px-4 py-3">Memory</th>
+                  <th className="px-4 py-3 text-center">Restarts</th>
+                  <th className="px-4 py-3">Uptime</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-mono">
+                {containers.map((c) => {
+                  const isRunning = c.status === "running";
+                  const isHealthy = c.state === "healthy";
+                  return (
+                    <tr key={c.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className={`w-2.5 h-2.5 rounded-full ${isRunning ? (isHealthy ? "bg-emerald-500" : "bg-rose-500") : "bg-slate-400"}`} />
+                          <span className="font-bold text-slate-900 font-sans">{c.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-slate-500 text-[11px] truncate max-w-[140px]">{c.image}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
+                          isRunning ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-600 border border-slate-200"
+                        }`}>
+                          {c.status.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
+                          isHealthy ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : !isRunning ? "bg-slate-100 text-slate-500" : "bg-rose-50 text-rose-700 border border-rose-200"
+                        }`}>
+                          {c.state?.toUpperCase() || "N/A"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`font-semibold ${c.cpu_percent > 80 ? "text-rose-600" : c.cpu_percent > 50 ? "text-amber-600" : "text-slate-800"}`}>
+                          {c.cpu_percent}%
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-700">
+                        {c.memory_mb} <span className="text-slate-400">/ {c.memory_limit_mb} MB</span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`px-1.5 py-0.5 rounded text-[11px] font-bold ${c.restart_count > 2 ? "bg-rose-100 text-rose-700" : "text-slate-600"}`}>
+                          {c.restart_count}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-500 text-[11px]">{c.uptime}</td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => handleInspect(c)}
+                            className="px-2 py-1 text-[11px] text-indigo-600 hover:bg-indigo-50 rounded border border-indigo-200 font-sans font-medium"
+                          >
+                            Inspect
+                          </button>
+                          {isRunning ? (
+                            <>
+                              <button
+                                onClick={() => handleAction(c.id, "restart")}
+                                disabled={actionLoadingId === `${c.id}-restart`}
+                                className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-sans font-medium disabled:opacity-50"
+                              >
+                                {actionLoadingId === `${c.id}-restart` ? "..." : "Restart"}
+                              </button>
+                              <button
+                                onClick={() => handleAction(c.id, "stop")}
+                                disabled={actionLoadingId === `${c.id}-stop`}
+                                className="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-[11px] font-sans font-medium disabled:opacity-50"
+                              >
+                                Stop
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => handleAction(c.id, "start")}
+                              disabled={actionLoadingId === `${c.id}-start`}
+                              className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-sans font-semibold disabled:opacity-50"
+                            >
+                              Start
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       ) : (
+        /* ── Containers Cards Grid ── */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {containers.map((c) => {
             const isRunning = c.status === "running";

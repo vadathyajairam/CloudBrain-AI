@@ -69,6 +69,19 @@ def approve_and_execute(action_id: str, req: Optional[ApproveRequest] = None) ->
         raise HTTPException(status_code=403, detail=str(e))
     except SafetyValidationError as e:
         raise HTTPException(status_code=422, detail=str(e))
+@router.post("/{action_id}/reject")
+def reject_action(action_id: str, req: Optional[ApproveRequest] = None) -> dict[str, Any]:
+    """Reject a PENDING remediation action. Ensures no Docker action executes."""
+    rejected_by = req.approved_by if req else "admin"
+    role = req.role if req else "admin"
+    try:
+        return remediation_engine.reject_action(
+            action_id=action_id,
+            rejected_by=rejected_by,
+            role=role,
+        )
+    except AuthorizationError as e:
+        raise HTTPException(status_code=403, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
