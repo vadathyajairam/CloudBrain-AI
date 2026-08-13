@@ -58,7 +58,7 @@ export const ChaosView: React.FC<ChaosViewProps> = ({
             Chaos Sandbox & Real-World Failure Lab
           </h2>
           <p className="text-xs text-slate-400">
-            Inject realistic production outages to showcase CloudBrain AI’s end-to-end detection, RCA, and remediation workflow
+            Inject realistic production outages to showcase Synexis AI’s end-to-end detection, RCA, and remediation workflow
           </p>
         </div>
 

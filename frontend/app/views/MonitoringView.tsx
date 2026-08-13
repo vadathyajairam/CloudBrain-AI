@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Cpu, MemoryStick, HardDrive, Wifi, Server, Layers } from "lucide-react";
+import { Cpu, MemoryStick, HardDrive, Wifi, Activity } from "lucide-react";
 import { SystemMetrics } from "../lib/api";
 import { LiveChart } from "../components/LiveChart";
 import { MetricCard } from "../components/MetricCard";
@@ -14,46 +14,51 @@ interface MonitoringViewProps {
 export const MonitoringView: React.FC<MonitoringViewProps> = ({ metrics, history }) => {
   const [timeRange, setTimeRange] = useState<string>("live");
 
-  const cpuSeries = history.map((h) => ({
+  const cpuData = history.map((h) => ({
     timestamp: h.timestamp,
     value: h.cpu.usage_percent,
   }));
 
-  const memSeries = history.map((h) => ({
+  const memData = history.map((h) => ({
     timestamp: h.timestamp,
     value: h.memory.usage_percent,
     secondaryValue: h.memory.swap_percent,
   }));
 
-  const netSeries = history.map((h) => ({
+  const netData = history.map((h) => ({
     timestamp: h.timestamp,
     value: h.network.download_kbps,
     secondaryValue: h.network.upload_kbps,
   }));
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="p-6 space-y-6 max-w-7xl mx-auto">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
         <div>
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <Cpu className="w-5 h-5 text-cyan-400" />
-            Infrastructure Telemetry & Metrics Engine
-          </h2>
-          <p className="text-xs text-slate-400">
-            Real-time multi-dimensional timeseries metrics gathered via high-precision OS collectors
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-slate-900 leading-tight flex items-center gap-2">
+              <Activity className="w-5 h-5 text-indigo-600" />
+              Live Host Telemetry & Compute Metrics
+            </h1>
+            <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full font-mono">
+              Source: Local Machine (psutil)
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Real-time CPU, RAM, Disk, and Network telemetry sampled directly from host OS counters
           </p>
         </div>
 
-        <div className="flex items-center space-x-2 bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs">
+        <div className="flex items-center space-x-2 bg-white border border-slate-200 p-1 rounded-xl text-xs shadow-xs">
           {["live", "5m", "15m", "1h"].map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
               className={`px-3 py-1 rounded-lg font-mono transition-all ${
                 timeRange === range
-                  ? "bg-indigo-600 text-white shadow-md font-semibold"
-                  : "text-slate-400 hover:text-white"
+                  ? "bg-indigo-600 text-white shadow-xs font-semibold"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
               }`}
             >
               {range.toUpperCase()}
@@ -83,7 +88,7 @@ export const MonitoringView: React.FC<MonitoringViewProps> = ({ metrics, history
           percent={metrics?.memory.usage_percent ?? 0}
         />
         <MetricCard
-          title="Storage Partition (C:\\)"
+          title="Storage Partition"
           value={metrics?.disk.used_gb ?? 0}
           unit={`/ ${metrics?.disk.total_gb ?? 0} GB`}
           subtitle={`Free: ${metrics?.disk.free_gb ?? 0} GB (${(100 - (metrics?.disk.usage_percent ?? 0)).toFixed(0)}%)`}
@@ -98,85 +103,44 @@ export const MonitoringView: React.FC<MonitoringViewProps> = ({ metrics, history
           subtitle={`Total Sent: ${metrics?.network.total_sent_mb ?? 0} MB`}
           icon={Wifi}
           color="amber"
-          badge="Live I/O"
+          percent={Math.min(100, (metrics?.network.download_kbps ?? 0) / 10)}
         />
       </div>
 
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-xl">
-          <LiveChart
-            data={cpuSeries}
-            title="CPU Utilization History"
-            color="#06b6d4"
-            primaryLabel="CPU Total"
-            unit="%"
-            height={200}
-            maxVal={100}
-          />
-        </div>
-
-        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-xl">
-          <LiveChart
-            data={memSeries}
-            title="Virtual Memory & Swap Pressure"
-            color="#818cf8"
-            secondaryColor="#f43f5e"
-            primaryLabel="RAM Usage"
-            secondaryLabel="Swap Pressure"
-            unit="%"
-            height={200}
-            maxVal={100}
-          />
-        </div>
-
-        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-xl lg:col-span-2">
-          <LiveChart
-            data={netSeries}
-            title="Network Traffic Ingress / Egress Rate"
-            color="#10b981"
-            secondaryColor="#f59e0b"
-            primaryLabel="Download (Ingress)"
-            secondaryLabel="Upload (Egress)"
-            unit=" KB/s"
-            height={200}
-            maxVal={600}
-          />
-        </div>
+      {/* Real-time SVG Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <LiveChart
+          title="Host Processor Telemetry (Real-time %)"
+          data={cpuData}
+          color="#06b6d4"
+          maxVal={100}
+          unit="%"
+          primaryLabel="CPU %"
+        />
+        <LiveChart
+          title="Memory Utilization & Dynamic Swap Rate"
+          data={memData}
+          color="#6366f1"
+          secondaryColor="#f43f5e"
+          maxVal={100}
+          unit="%"
+          primaryLabel="RAM %"
+          secondaryLabel="Swap %"
+        />
       </div>
 
-      {/* Per-Core CPU Breakdown */}
-      {metrics?.cpu.cores_usage && metrics.cpu.cores_usage.length > 0 && (
-        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-indigo-400" />
-            Logical CPU Core Distribution ({metrics.cpu.cores_usage.length} Cores)
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2.5">
-            {metrics.cpu.cores_usage.map((usage, idx) => (
-              <div
-                key={idx}
-                className="p-3 rounded-xl bg-slate-950/70 border border-slate-800/80 flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
-                  <span>Core #{idx}</span>
-                  <span className={usage > 80 ? "text-rose-400 font-bold" : "text-slate-300"}>
-                    {usage}%
-                  </span>
-                </div>
-                <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      usage > 80 ? "bg-rose-500" : usage > 50 ? "bg-amber-500" : "bg-cyan-500"
-                    }`}
-                    style={{ width: `${usage}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className="grid grid-cols-1 gap-6">
+        <LiveChart
+          title="Network Interface Activity (Inbound / Outbound KB/s)"
+          data={netData}
+          color="#10b981"
+          secondaryColor="#f59e0b"
+          maxVal={1000}
+          unit="KB/s"
+          primaryLabel="Download"
+          secondaryLabel="Upload"
+        />
+      </div>
     </div>
   );
 };

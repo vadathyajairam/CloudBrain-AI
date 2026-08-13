@@ -57,7 +57,7 @@ export const ChaosModal: React.FC<ChaosModalProps> = ({
                 Chaos Sandbox & Failure Injection Lab
               </h2>
               <p className="text-xs text-slate-400">
-                Simulate production outages to test CloudBrain AI’s automated detection, RCA, and remediation.
+                Simulate production outages to test Synexis AI’s automated detection, RCA, and remediation.
               </p>
             </div>
           </div>

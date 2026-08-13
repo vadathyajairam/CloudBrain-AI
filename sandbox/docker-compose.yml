@@ -1,0 +1,83 @@
+version: "3.8"
+
+# Synexis — Controlled Sandbox
+# These are the ONLY containers Synexis monitors and manages.
+# All container names use the 'synexis-' prefix so Synexis isolates to exactly these.
+#
+# Start:  docker compose -f sandbox/docker-compose.yml up -d --build
+# Stop:   docker compose -f sandbox/docker-compose.yml down
+# Logs:   docker compose -f sandbox/docker-compose.yml logs -f
+
+services:
+  # ── Demo Application ───────────────────────────────────────────────────────
+  demo-app:
+    build:
+      context: ./demo-app
+      dockerfile: Dockerfile
+    container_name: synexis-demo-app
+    ports:
+      - "5050:5000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql://synexis:synexis_secret@synexis-postgres:5432/synexis
+      - REDIS_URL=redis://synexis-redis:6379/0
+      - APP_ENV=sandbox
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    labels:
+      synexis.role: "demo-app"
+      synexis.tier: "application"
+
+  # ── PostgreSQL Database ────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: synexis-postgres
+    environment:
+      POSTGRES_DB: synexis
+      POSTGRES_USER: synexis
+      POSTGRES_PASSWORD: synexis_secret
+    ports:
+      - "5433:5432"          # 5433 on host to avoid conflicts with local postgres
+    volumes:
+      - synexis_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U synexis -d synexis"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    labels:
+      synexis.role: "database"
+      synexis.tier: "data"
+
+  # ── Redis Cache ────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: synexis-redis
+    ports:
+      - "6380:6379"          # 6380 on host to avoid conflicts with local redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+    labels:
+      synexis.role: "cache"
+      synexis.tier: "data"
+
+volumes:
+  synexis_pg_data:
+    driver: local

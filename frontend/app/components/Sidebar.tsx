@@ -5,32 +5,27 @@ import {
   LayoutDashboard,
   Activity,
   FileText,
-  GitBranch,
   BrainCircuit,
   AlertOctagon,
   Boxes,
-  Server,
-  Cloud,
+  Database,
   ShieldCheck,
-  Rocket,
   Wrench,
   Flame,
   Bot,
-  ChevronLeft,
+  BookOpen,
+  CheckCircle2,
 } from "lucide-react";
 
 export type NavTab =
   | "dashboard"
   | "monitoring"
   | "logs"
-  | "traces"
   | "ai_rca"
   | "incidents"
   | "containers"
-  | "kubernetes"
-  | "cloud_services"
+  | "data_sources"
   | "config"
-  | "deployments"
   | "remediation"
   | "chaos"
   | "assistant";
@@ -49,6 +44,7 @@ interface NavItem {
   group: string;
   badge?: string | number;
   badgeColor?: string;
+  tag?: string;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -59,23 +55,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navItems: NavItem[] = [
     // Main
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, group: "main" },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, group: "Overview" },
     // Observability
-    { id: "monitoring", label: "Monitoring", icon: Activity, group: "Observability" },
-    { id: "logs", label: "Log Explorer", icon: FileText, group: "Observability" },
-    { id: "traces", label: "Traces", icon: GitBranch, group: "Observability" },
+    { id: "monitoring", label: "Host Telemetry", icon: Activity, group: "Observability" },
+    { id: "logs", label: "Log Stream", icon: FileText, group: "Observability" },
     // Intelligence
     {
       id: "ai_rca",
       label: "AI Root Cause (RCA)",
       icon: BrainCircuit,
-      group: "Intelligence",
+      group: "Intelligence & RAG",
+      tag: "RAG",
     },
     {
       id: "incidents",
-      label: "Incidents",
+      label: "Incidents Lifecycle",
       icon: AlertOctagon,
-      group: "Intelligence",
+      group: "Intelligence & RAG",
       badge: activeIncidentsCount > 0 ? activeIncidentsCount : undefined,
       badgeColor:
         activeIncidentsCount > 0
@@ -83,111 +79,107 @@ export const Sidebar: React.FC<SidebarProps> = ({
           : undefined,
     },
     // Infrastructure
-    { id: "containers", label: "Containers & Docker", icon: Boxes, group: "Infrastructure" },
-    { id: "kubernetes", label: "Kubernetes", icon: Server, group: "Infrastructure" },
-    { id: "cloud_services", label: "Cloud Services", icon: Cloud, group: "Infrastructure" },
+    { id: "containers", label: "Docker Containers", icon: Boxes, group: "Infrastructure" },
+    { id: "data_sources", label: "Data Sources", icon: Database, group: "Infrastructure" },
     { id: "config", label: "Config & Security", icon: ShieldCheck, group: "Infrastructure" },
     // Operations
-    { id: "deployments", label: "Deployments", icon: Rocket, group: "Operations" },
-    { id: "remediation", label: "Remediation Console", icon: Wrench, group: "Operations" },
+    { id: "remediation", label: "Remediation & Audit", icon: Wrench, group: "Operations" },
     {
       id: "chaos",
-      label: "Chaos Sandbox",
+      label: "Chaos Sandbox Lab",
       icon: Flame,
       group: "Operations",
-      badge: activeChaos ? "ACTIVE" : "NEW",
-      badgeColor: activeChaos
-        ? "bg-rose-100 text-rose-600 animate-pulse"
-        : "bg-blue-100 text-blue-600",
+      badge: activeChaos ? "ACTIVE" : undefined,
+      badgeColor: activeChaos ? "bg-rose-500 text-white font-bold" : undefined,
     },
-    // Assistant
-    { id: "assistant", label: "AI DevOps Copilot", icon: Bot, group: "Assistant" },
+    { id: "assistant", label: "DevOps Copilot", icon: Bot, group: "Operations" },
   ];
 
-  const groups = [
-    { id: "main", label: null },
-    { id: "Observability", label: "OBSERVABILITY" },
-    { id: "Intelligence", label: "INTELLIGENCE" },
-    { id: "Infrastructure", label: "INFRASTRUCTURE" },
-    { id: "Operations", label: "OPERATIONS" },
-    { id: "Assistant", label: "ASSISTANT" },
-  ];
+  const groups = Array.from(new Set(navItems.map((item) => item.group)));
 
   return (
-    <aside className="w-64 min-h-[calc(100vh-61px)] border-r border-slate-200 bg-white p-3 flex flex-col justify-between shrink-0 overflow-y-auto">
-      <div className="space-y-0.5">
-        {groups.map((grp) => {
-          const items = navItems.filter((i) => i.group === grp.id);
-          if (items.length === 0) return null;
-
-          return (
-            <div key={grp.id} className={grp.label ? "pt-4" : ""}>
-              {grp.label && (
-                <span className="px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 block mb-1">
-                  {grp.label}
-                </span>
-              )}
-              <div className="space-y-0.5">
-                {items.map((item) => {
+    <aside className="w-64 bg-slate-900 text-slate-300 border-r border-slate-800 flex flex-col shrink-0 h-[calc(100vh-61px)] sticky top-[61px]">
+      <div className="p-3 flex-1 overflow-y-auto space-y-5">
+        {groups.map((group) => (
+          <div key={group}>
+            <div className="px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+              {group}
+            </div>
+            <div className="space-y-0.5">
+              {navItems
+                .filter((item) => item.group === group)
+                .map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
-
                   return (
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all group ${
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                         isActive
-                          ? "bg-indigo-50 text-indigo-700"
-                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                          ? "bg-indigo-600 text-white shadow-sm shadow-indigo-600/30"
+                          : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <Icon
                           className={`w-4 h-4 shrink-0 ${
-                            isActive
-                              ? "text-indigo-600"
-                              : "text-slate-400 group-hover:text-slate-600"
+                            isActive ? "text-white" : "text-slate-400"
                           }`}
                         />
                         <span className="truncate">{item.label}</span>
                       </div>
-
-                      {item.badge !== undefined && (
-                        <span
-                          className={`px-1.5 py-0.5 text-[9px] font-semibold rounded-full shrink-0 ${item.badgeColor}`}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1.5">
+                        {item.tag && (
+                          <span
+                            className={`text-[9px] px-1.5 py-0.5 rounded font-mono uppercase tracking-wide ${
+                              isActive
+                                ? "bg-indigo-700 text-indigo-100"
+                                : "bg-slate-800 text-cyan-400 border border-slate-700"
+                            }`}
+                          >
+                            {item.tag}
+                          </span>
+                        )}
+                        {item.badge !== undefined && (
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                              item.badgeColor || "bg-slate-700 text-slate-300"
+                            }`}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
                     </button>
                   );
                 })}
-              </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
-      {/* ── Footer ── */}
-      <div className="mt-6 space-y-2">
-        {/* System Status */}
-        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-slate-50 border border-slate-200">
-          <span className="relative flex h-2.5 w-2.5 shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-          </span>
-          <div>
-            <div className="text-xs font-semibold text-slate-700 leading-tight">System Status</div>
-            <div className="text-[10px] text-slate-500">All Systems Operational</div>
+      {/* ── Bottom System Status Card ── */}
+      <div className="p-3 border-t border-slate-800 bg-slate-950/50">
+        <div className="rounded-lg bg-slate-900/80 border border-slate-800 p-2.5 space-y-1.5">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="text-slate-400 font-medium flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              Engine Status
+            </span>
+            <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-800/50">
+              OPERATIONAL
+            </span>
+          </div>
+          <div className="text-[10px] text-slate-500 flex justify-between">
+            <span>RAG Retriever:</span>
+            <span className="text-cyan-400 font-mono">READY</span>
+          </div>
+          <div className="text-[10px] text-slate-500 flex justify-between">
+            <span>Safety Gate:</span>
+            <span className="text-indigo-400 font-mono">ENFORCED</span>
           </div>
         </div>
-
-        {/* Collapse */}
-        <button className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-colors">
-          <ChevronLeft className="w-4 h-4" />
-          <span>Collapse</span>
-        </button>
       </div>
     </aside>
   );

@@ -1,24 +1,26 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { 
-  Bot, 
-  Send, 
-  Trash2, 
-  X, 
-  Sparkles, 
-  Terminal, 
-  Layers, 
+import {
+  Bot,
+  Send,
+  Trash2,
+  X,
+  Sparkles,
+  Terminal,
+  Layers,
   ArrowRight,
   ShieldCheck,
-  CheckCircle
+  CheckCircle,
+  BookOpen,
 } from "lucide-react";
-import { api } from "../lib/api";
+import { api, RAGSource } from "../lib/api";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: string;
+  rag_sources?: RAGSource[];
 }
 
 interface DevOpsChatDrawerProps {
@@ -38,11 +40,11 @@ export const DevOpsChatDrawer: React.FC<DevOpsChatDrawerProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const suggestedPrompts = [
-    "Why is the application running slowly?",
-    "Check container statuses & restart history",
+    "Why is PostgreSQL or demo-app failing?",
+    "Check container statuses & restart counts",
     "What caused the recent error spike in logs?",
-    "Explain the active incident and root cause",
-    "How can I resolve high CPU utilization?"
+    "Explain active incident root cause & RAG runbook",
+    "How can I resolve high CPU utilization?",
   ];
 
   const fetchHistory = async () => {
@@ -52,7 +54,7 @@ export const DevOpsChatDrawer: React.FC<DevOpsChatDrawerProps> = ({
         setMessages(data.history);
       }
     } catch (e) {
-      console.error(e);
+      console.error("Error loading chat history:", e);
     }
   };
 
@@ -73,7 +75,7 @@ export const DevOpsChatDrawer: React.FC<DevOpsChatDrawerProps> = ({
     const userMsg: Message = {
       role: "user",
       content: text,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -90,9 +92,9 @@ export const DevOpsChatDrawer: React.FC<DevOpsChatDrawerProps> = ({
         ...prev,
         {
           role: "assistant",
-          content: `⚠️ Failed to query CloudBrain backend: ${e.message}`,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }
+          content: `⚠️ Failed to query Synexis AI backend: ${e.message}`,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        },
       ]);
     } finally {
       setLoading(false);
@@ -100,138 +102,155 @@ export const DevOpsChatDrawer: React.FC<DevOpsChatDrawerProps> = ({
   };
 
   const handleClear = async () => {
-    await api.clearChatHistory();
-    await fetchHistory();
+    try {
+      await api.clearChatHistory();
+      setMessages([]);
+      await fetchHistory();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   if (!isOpen && !isFullScreen) return null;
 
-  const containerClasses = isFullScreen
-    ? "w-full h-[calc(100vh-140px)] flex flex-col rounded-2xl bg-slate-900 border border-slate-800 p-4 shadow-xl"
-    : "fixed right-0 top-0 bottom-0 z-50 w-full sm:w-[480px] bg-slate-900/95 border-l border-slate-800 shadow-2xl backdrop-blur-2xl flex flex-col animate-slideLeft";
-
   return (
-    <div className={containerClasses}>
+    <div
+      className={`fixed inset-y-0 right-0 z-50 w-full sm:w-[480px] bg-white border-l border-slate-200 shadow-2xl flex flex-col transition-all duration-300 ${
+        isFullScreen ? "relative inset-0 w-full border-none shadow-none" : ""
+      }`}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-950/60">
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-600 to-indigo-600 shadow-md text-white">
+      <div className="h-[61px] px-4 flex items-center justify-between border-b border-slate-200 bg-white shrink-0">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center text-white shadow-sm">
             <Bot className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-white flex items-center gap-1.5">
-              CloudBrain AI Copilot
-              <span className="px-1.5 py-0.2 text-[9px] font-mono uppercase bg-indigo-950 text-indigo-300 border border-indigo-700/60 rounded">
-                Live RAG
+            <div className="text-xs font-bold text-slate-900 leading-tight flex items-center gap-1.5">
+              <span>Synexis AI Copilot</span>
+              <span className="text-[9px] font-semibold bg-indigo-50 text-indigo-700 px-1.5 py-0.2 rounded border border-indigo-200">
+                RAG Grounded
               </span>
-            </h2>
-            <p className="text-[11px] text-slate-400">
-              Context-aware assistant connected to live system telemetry
-            </p>
+            </div>
+            <div className="text-[10px] text-slate-500">Live Telemetry & Knowledge Assistant</div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-1">
+        <div className="flex items-center gap-1">
           <button
             onClick={handleClear}
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
             title="Clear Chat History"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
           </button>
           {!isFullScreen && (
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           )}
         </div>
       </div>
 
-      {/* Messages Thread */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-3.5 text-xs">
-        {messages.map((m, i) => {
-          const isUser = m.role === "user";
-
-          return (
+      {/* Messages Stream */}
+      <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50">
+        {messages.map((msg, idx) => (
+          <div
+            key={idx}
+            className={`flex flex-col ${
+              msg.role === "user" ? "items-end" : "items-start"
+            }`}
+          >
             <div
-              key={i}
-              className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}
+              className={`max-w-[90%] rounded-xl p-3.5 text-xs leading-relaxed shadow-xs ${
+                msg.role === "user"
+                  ? "bg-indigo-600 text-white rounded-br-none"
+                  : "bg-white border border-slate-200 text-slate-800 rounded-bl-none"
+              }`}
             >
-              <div className="flex items-center space-x-1.5 mb-1 px-1">
-                <span className="text-[10px] font-semibold text-slate-500 font-mono">
-                  {isUser ? "You" : "CloudBrain AI"}
-                </span>
-                <span className="text-[9px] text-slate-600 font-mono">
-                  {m.timestamp}
-                </span>
-              </div>
+              <div className="whitespace-pre-wrap">{msg.content}</div>
 
-              <div
-                className={`p-3.5 rounded-2xl max-w-[90%] leading-relaxed whitespace-pre-wrap ${
-                  isUser
-                    ? "bg-indigo-600 text-white rounded-br-none shadow-md"
-                    : "bg-slate-950 border border-slate-800 text-slate-200 rounded-bl-none font-sans"
-                }`}
-              >
-                {m.content}
-              </div>
+              {/* RAG Knowledge Citations */}
+              {msg.rag_sources && msg.rag_sources.length > 0 && (
+                <div className="mt-2.5 pt-2 border-t border-slate-100 space-y-1">
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                    <BookOpen className="w-3 h-3 text-indigo-500" />
+                    Referenced RAG Runbooks:
+                  </div>
+                  <div className="space-y-1">
+                    {msg.rag_sources.map((src, sIdx) => (
+                      <div
+                        key={sIdx}
+                        className="text-[10px] bg-slate-50 p-1.5 rounded border border-slate-200 text-slate-700 font-mono flex items-center justify-between"
+                      >
+                        <span className="truncate">{src.title}</span>
+                        <span className="text-indigo-600 font-bold shrink-0">{Math.round((src.score || 0.8) * 100)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          );
-        })}
+            <span className="text-[10px] text-slate-400 mt-1 px-1 font-mono">{msg.timestamp}</span>
+          </div>
+        ))}
 
         {loading && (
-          <div className="flex items-center space-x-2 text-indigo-400 p-3 rounded-xl bg-slate-950/60 border border-slate-800 w-fit">
-            <Bot className="w-4 h-4 animate-spin" />
-            <span className="text-xs font-mono">Analyzing metrics & telemetry signals...</span>
+          <div className="flex items-center gap-2 text-xs text-slate-500 bg-white p-3 rounded-xl border border-slate-200 w-fit">
+            <Sparkles className="w-4 h-4 text-indigo-500 animate-spin" />
+            <span>Synexis AI is querying live telemetry & RAG knowledge...</span>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Suggested Prompts */}
-      <div className="p-3 border-t border-slate-800 bg-slate-950/40">
-        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
-          Suggested Questions
-        </span>
-        <div className="flex flex-wrap gap-1.5">
-          {suggestedPrompts.slice(0, 3).map((prompt, i) => (
+      <div className="px-4 py-2 border-t border-slate-200 bg-white shrink-0">
+        <div className="text-[10px] font-semibold text-slate-400 mb-1.5 flex items-center gap-1">
+          <Sparkles className="w-3 h-3 text-amber-500" />
+          Suggested Questions:
+        </div>
+        <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+          {suggestedPrompts.map((p, idx) => (
             <button
-              key={i}
-              onClick={() => handleSend(prompt)}
-              className="text-[10px] text-slate-300 hover:text-white bg-slate-900 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/50 px-2.5 py-1 rounded-full transition-all text-left truncate max-w-full"
+              key={idx}
+              onClick={() => handleSend(p)}
+              className="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-600 border border-slate-200 transition-colors whitespace-nowrap"
             >
-              • {prompt}
+              {p}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Input Area */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSend();
-        }}
-        className="p-3 border-t border-slate-800 bg-slate-950/80 flex items-center space-x-2"
-      >
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask CloudBrain about incidents, containers, or logs..."
-          className="flex-1 bg-slate-900 border border-slate-700/80 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none transition-colors"
-        />
-        <button
-          type="submit"
-          disabled={!input.trim() || loading}
-          className="p-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white shadow-lg transition-all"
+      {/* Input */}
+      <div className="p-3 border-t border-slate-200 bg-white shrink-0">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSend();
+          }}
+          className="flex items-center gap-2"
         >
-          <Send className="w-4 h-4" />
-        </button>
-      </form>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask Synexis about your system, logs, or runbooks..."
+            className="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-800 placeholder-slate-400"
+          />
+          <button
+            type="submit"
+            disabled={!input.trim() || loading}
+            className="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors disabled:opacity-50 shadow-xs"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

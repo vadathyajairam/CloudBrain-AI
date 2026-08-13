@@ -100,10 +100,28 @@ export const ContainersView: React.FC<ContainersViewProps> = ({ containers, onRe
       </div>
 
       {/* Containers Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {containers.map((c) => {
-          const isRunning = c.status === "running";
-          const isHealthy = c.state === "healthy";
+      {containers.length === 0 ? (
+        <div className="p-12 rounded-2xl bg-white border border-slate-200 text-center space-y-3 shadow-sm">
+          <div className="text-4xl">🐳</div>
+          <h3 className="text-base font-bold text-slate-800">Docker Engine Disconnected</h3>
+          <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+            Docker Desktop is offline or no <code>synexis-*</code> / <code>cloudbrain-*</code> sandbox containers were found. Start Docker Desktop and launch the sandbox cluster to begin live container tracking.
+          </p>
+          <div className="pt-2">
+            <button
+              onClick={onRefresh}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors inline-flex items-center gap-1.5"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Retry Docker Probe</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {containers.map((c) => {
+            const isRunning = c.status === "running";
+            const isHealthy = c.state === "healthy";
 
           return (
             <div
@@ -241,6 +259,7 @@ export const ContainersView: React.FC<ContainersViewProps> = ({ containers, onRe
           );
         })}
       </div>
+      )}
 
       {/* Inspect Container Drawer/Modal with Live Logs */}
       {selectedContainer && (

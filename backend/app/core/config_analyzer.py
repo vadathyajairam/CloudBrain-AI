@@ -43,7 +43,7 @@ CMD ["python", "main.py"]
     "k8s_manifest_vulnerable": """apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cloudbrain-api
+  name: synexis-api
 spec:
   replicas: 1
   template:

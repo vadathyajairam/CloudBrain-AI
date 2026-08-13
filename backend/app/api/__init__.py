@@ -1,3 +1,3 @@
 """
-FastAPI Routes for CloudBrain AI
+FastAPI Routes for Synexis Platform
 """

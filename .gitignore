@@ -45,3 +45,10 @@ Thumbs.db
 # ── Logs ─────────────────────────────────────────────────
 logs/
 *.log
+
+# ── Databases & Caches ────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+.pytest_cache/
+

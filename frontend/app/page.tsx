@@ -20,27 +20,12 @@ import { DashboardView } from "./views/DashboardView";
 import { MonitoringView } from "./views/MonitoringView";
 import { LogsView } from "./views/LogsView";
 import { AIRCAView } from "./views/AIRCAView";
-import { IncidentsView } from "./views/IncidentsView";
+import IncidentsView from "./views/IncidentsView";
 import { ContainersView } from "./views/ContainersView";
 import { ConfigView } from "./views/ConfigView";
 import { ChaosView } from "./views/ChaosView";
 import { RemediationView } from "./views/RemediationView";
-
-// ── Simple stub for new nav tabs ──────────────────────────
-const ComingSoonView = ({ title }: { title: string }) => (
-  <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 p-8">
-    <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center">
-      <span className="text-2xl">🚀</span>
-    </div>
-    <h2 className="text-xl font-bold text-slate-800">{title}</h2>
-    <p className="text-sm text-slate-500 text-center max-w-sm">
-      This module is coming soon. It will provide deep integration with your infrastructure.
-    </p>
-    <span className="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700">
-      In Development
-    </span>
-  </div>
-);
+import DataSourcesView from "./views/DataSourcesView";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>("dashboard");
@@ -112,24 +97,24 @@ export default function App() {
   const handleOpenInvestigation = (customData?: any) => {
     if (customData && customData.status === "RESOLVED") {
       const resolvedRpt: RCAReport = {
-        incident_id: customData.id,
-        timestamp: customData.timestamp,
-        status: "HEALTHY",
-        title: customData.title,
-        severity: customData.severity,
-        confidence_score: customData.confidence,
-        detected_issue: customData.detected_issue,
-        probable_root_cause: customData.probable_root_cause,
-        evidence_chain: [
-          {
-            type: "POST_MORTEM",
-            source: "Incident History",
-            detail: `Resolved with: ${customData.resolution}`,
-          },
-        ],
-        impact: "Resolved during maintenance window.",
-        recommended_actions: [],
-        ai_explanation: `This incident was resolved. Resolution note: ${customData.resolution}`,
+        incident_id: customData.id || "INC-RESOLVED",
+        timestamp: customData.timestamp || new Date().toISOString(),
+        status: "RESOLVED",
+        model_used: "synexis-rca",
+        root_cause: customData.probable_root_cause || customData.title || "Resolved Incident",
+        confidence: customData.confidence || 95,
+        alternative_causes: [],
+        recommendation: `Resolved with: ${customData.resolution || "Manual remediation"}`,
+        structured_actions: [],
+        rag_sources: [],
+        evidence_summary: `Resolution note: ${customData.resolution || "Verified recovered"}`,
+        evidence_bundle: {
+          system: {},
+          containers: [],
+          log_stats: {},
+          error_samples: [],
+          collected_evidence: [],
+        },
       };
       setInvestigationReport(resolvedRpt);
     } else {
@@ -140,7 +125,7 @@ export default function App() {
 
   const handleAnalyzeLogsWithAI = async (contextText: string) => {
     try {
-      const res = await api.analyzeRCA(contextText);
+      const res = await api.analyzeRCA();
       setInvestigationReport(res);
       setIsInvestigationModalOpen(true);
     } catch {
@@ -148,12 +133,10 @@ export default function App() {
     }
   };
 
-  const activeIncidentsCount = rcaReport && rcaReport.status !== "HEALTHY" ? 1 : 0;
+  const activeIncidentsCount = rcaReport && rcaReport.status !== "HEALTHY" && Boolean(rcaReport.root_cause) ? 1 : 0;
 
   return (
-    // ── Full-page wrapper: light grey background ──
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-indigo-500 selection:text-white">
-
       {/* ── Full-width sticky top bar ── */}
       <Navbar
         metrics={metrics}
@@ -201,38 +184,17 @@ export default function App() {
             <LogsView onAnalyzeWithAI={handleAnalyzeLogsWithAI} />
           )}
 
-          {activeTab === "traces" && (
-            <ComingSoonView title="Distributed Tracing" />
-          )}
-
           {activeTab === "ai_rca" && (
             <AIRCAView report={rcaReport} onRefresh={fetchAllData} />
           )}
 
-          {activeTab === "incidents" && (
-            <IncidentsView
-              onInvestigate={handleOpenInvestigation}
-              onOpenChaosModal={() => setIsChaosModalOpen(true)}
-            />
-          )}
+          {activeTab === "incidents" && <IncidentsView />}
 
           {activeTab === "containers" && (
             <ContainersView containers={containers} onRefresh={fetchAllData} />
           )}
 
-          {activeTab === "kubernetes" && (
-            <ComingSoonView title="Kubernetes Cluster Management" />
-          )}
-
-          {activeTab === "cloud_services" && (
-            <ComingSoonView title="Cloud Services Management" />
-          )}
-
           {activeTab === "config" && <ConfigView />}
-
-          {activeTab === "deployments" && (
-            <ComingSoonView title="Deployment Pipeline" />
-          )}
 
           {activeTab === "remediation" && <RemediationView />}
 
@@ -246,10 +208,12 @@ export default function App() {
             />
           )}
 
+          {activeTab === "data_sources" && <DataSourcesView />}
+
           {activeTab === "assistant" && (
             <div className="p-6 space-y-4">
               <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                CloudBrain AI DevOps Copilot Chat
+                Synexis AI DevOps Copilot Chat
               </h2>
               <DevOpsChatDrawer isOpen={true} onClose={() => {}} isFullScreen={true} />
             </div>

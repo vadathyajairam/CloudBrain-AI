@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CloudBrain AI – Intelligent Cloud Operations & DevOps Assistant",
-  description: "AI-powered Cloud & DevOps operations platform with real-time telemetry, automated log root cause analysis (RCA), and human-in-the-loop remediation.",
+  title: "Synexis – Intelligent System Analysis and Automation Platform",
+  description:
+    "Intelligent system analysis and automation platform integrating AI, RAG, Docker, Observability, Root Cause Analysis, and controlled automated remediation.",
   icons: {
     icon: "/favicon.ico",
   },
@@ -31,7 +32,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-slate-100 text-slate-900" suppressHydrationWarning>{children}</body>
+      <body
+        className="min-h-full flex flex-col bg-slate-100 text-slate-900"
+        suppressHydrationWarning
+      >
+        {children}
+      </body>
     </html>
   );
 }

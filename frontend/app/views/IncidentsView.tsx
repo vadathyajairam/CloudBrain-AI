@@ -1,192 +1,378 @@
 "use client";
+import { useState, useEffect, useCallback } from "react";
 
-import React, { useState, useEffect } from "react";
-import { 
-  AlertOctagon, 
-  CheckCircle2, 
-  BrainCircuit, 
-  Clock, 
-  ArrowRight, 
-  Filter, 
-  ShieldAlert,
-  Flame
-} from "lucide-react";
-import { api } from "../lib/api";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
-interface IncidentsViewProps {
-  onInvestigate: (incidentData?: any) => void;
-  onOpenChaosModal: () => void;
+interface Evidence {
+  type: string;
+  source: string;
+  detail: string;
+  collected_at?: string;
 }
 
-export const IncidentsView: React.FC<IncidentsViewProps> = ({ onInvestigate, onOpenChaosModal }) => {
-  const [data, setData] = useState<{ active_count: number; active_incidents: any[]; resolved_incidents: any[] }>({
-    active_count: 0,
-    active_incidents: [],
-    resolved_incidents: []
-  });
-  const [filter, setFilter] = useState<"all" | "active" | "resolved">("all");
+interface Incident {
+  id: string;
+  title: string;
+  description: string;
+  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  status: "DETECTED" | "ACKNOWLEDGED" | "INVESTIGATING" | "REMEDIATING" | "RESOLVED" | "CLOSED";
+  service: string;
+  container_id?: string;
+  rule_id?: string;
+  detected_at: string;
+  updated_at?: string;
+  resolved_at?: string;
+  auto_resolved?: boolean;
+  evidence: Evidence[];
+  latest_analysis?: {
+    root_cause?: string;
+    confidence?: number | null;
+    recommendation?: string;
+    model_used?: string;
+  } | null;
+}
 
-  const fetchIncidents = async () => {
-    try {
-      const res = await api.getIncidents();
-      setData(res);
-    } catch (e) {
-      console.error(e);
+interface IncidentStats {
+  total: number;
+  active: number;
+  critical_active: number;
+  resolved_today: number;
+}
+
+function SeverityBadge({ severity }: { severity: string }) {
+  return (
+    <span className={`status-badge severity-${severity}`}>{severity}</span>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  return (
+    <span className={`status-badge incident-status-${status}`}>{status}</span>
+  );
+}
+
+function EmptyIncidents() {
+  return (
+    <div className="empty-state">
+      <div className="empty-state-icon">✅</div>
+      <div className="empty-state-title">No Active Incidents</div>
+      <div className="empty-state-desc">
+        All systems are operating normally. Incidents will appear here automatically when the detection engine triggers a rule.
+      </div>
+    </div>
+  );
+}
+
+function IncidentRow({
+  incident,
+  onAction,
+}: {
+  incident: Incident;
+  onAction: (id: string, action: string) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  const detectedTime = incident.detected_at
+    ? new Date(incident.detected_at).toLocaleString()
+    : "—";
+
+  const nextAction = (): string | null => {
+    switch (incident.status) {
+      case "DETECTED":      return "acknowledge";
+      case "ACKNOWLEDGED":  return "investigate";
+      case "INVESTIGATING": return "resolve";
+      default:              return null;
     }
+  };
+
+  const actionLabel: Record<string, string> = {
+    acknowledge: "Acknowledge",
+    investigate: "Investigate",
+    resolve: "Resolve",
+  };
+
+  const action = nextAction();
+
+  return (
+    <>
+      <tr
+        style={{ cursor: "pointer" }}
+        onClick={() => setExpanded((p) => !p)}
+      >
+        <td>
+          <SeverityBadge severity={incident.severity} />
+        </td>
+        <td>
+          <div style={{ fontWeight: 500, color: "var(--text-primary)", fontSize: 13 }}>
+            {incident.title}
+          </div>
+          {incident.service && (
+            <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
+              {incident.service}
+              {incident.rule_id && ` · rule: ${incident.rule_id}`}
+            </div>
+          )}
+        </td>
+        <td>
+          <StatusBadge status={incident.status} />
+          {incident.auto_resolved && (
+            <span style={{ fontSize: 10, color: "var(--text-muted)", marginLeft: 6 }}>auto</span>
+          )}
+        </td>
+        <td style={{ color: "var(--text-muted)", fontSize: 12 }}>{detectedTime}</td>
+        <td>
+          {action && (
+            <button
+              className="btn btn-secondary"
+              style={{ fontSize: 11, padding: "3px 10px" }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onAction(incident.id, action);
+              }}
+            >
+              {actionLabel[action]}
+            </button>
+          )}
+        </td>
+      </tr>
+
+      {expanded && (
+        <tr>
+          <td
+            colSpan={5}
+            style={{
+              background: "var(--surface-1)",
+              padding: "0 0 0 0",
+              borderBottom: "1px solid var(--border)",
+            }}
+          >
+            <div style={{ padding: "14px 20px" }}>
+              {/* Description */}
+              {incident.description && (
+                <p style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 12 }}>
+                  {incident.description}
+                </p>
+              )}
+
+              {/* AI Analysis */}
+              {incident.latest_analysis && (
+                <div
+                  style={{
+                    background: "var(--surface-2)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "var(--radius)",
+                    padding: "12px 14px",
+                    marginBottom: 12,
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.4px" }}>
+                    AI Analysis · {incident.latest_analysis.model_used}
+                  </div>
+                  {incident.latest_analysis.root_cause && (
+                    <div style={{ fontSize: 13, color: "var(--text-primary)", marginBottom: 6 }}>
+                      <strong>Root Cause:</strong> {incident.latest_analysis.root_cause}
+                    </div>
+                  )}
+                  {incident.latest_analysis.confidence !== null && incident.latest_analysis.confidence !== undefined ? (
+                    <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>
+                      Confidence: <strong>{incident.latest_analysis.confidence}%</strong>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 12, color: "var(--warning)" }}>
+                      Confidence: Insufficient evidence
+                    </div>
+                  )}
+                  {incident.latest_analysis.recommendation && (
+                    <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 6 }}>
+                      <strong>Recommendation:</strong> {incident.latest_analysis.recommendation}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Evidence */}
+              {incident.evidence && incident.evidence.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.4px" }}>
+                    Evidence ({incident.evidence.length})
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    {incident.evidence.map((ev, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          display: "flex",
+                          gap: 10,
+                          fontSize: 12,
+                          color: "var(--text-secondary)",
+                          padding: "5px 0",
+                          borderBottom: i < incident.evidence.length - 1 ? "1px solid var(--border)" : "none",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 600,
+                            padding: "1px 5px",
+                            borderRadius: 3,
+                            background: "var(--surface-3)",
+                            color: "var(--text-muted)",
+                            flexShrink: 0,
+                            alignSelf: "flex-start",
+                            marginTop: 1,
+                          }}
+                        >
+                          {ev.type}
+                        </span>
+                        <span>
+                          <span style={{ color: "var(--text-muted)", marginRight: 6 }}>{ev.source}</span>
+                          {ev.detail}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
+  );
+}
+
+export default function IncidentsView() {
+  const [activeIncidents, setActiveIncidents] = useState<Incident[]>([]);
+  const [resolvedIncidents, setResolvedIncidents] = useState<Incident[]>([]);
+  const [stats, setStats] = useState<IncidentStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<"active" | "resolved">("active");
+  const [lastRefresh, setLastRefresh] = useState("");
+
+  const fetchIncidents = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/incidents`);
+      const data = await res.json();
+      setActiveIncidents(data.active_incidents || []);
+      setResolvedIncidents(data.resolved_incidents || []);
+      setStats(data.stats || null);
+      setLastRefresh(new Date().toLocaleTimeString());
+    } catch {
+      /* backend may not be running */
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const handleAction = async (id: string, action: string) => {
+    try {
+      await fetch(`${API}/incidents/${id}/${action}`, { method: "PATCH" });
+      await fetchIncidents();
+    } catch {}
   };
 
   useEffect(() => {
     fetchIncidents();
-    const interval = setInterval(fetchIncidents, 3000);
+    const interval = setInterval(fetchIncidents, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchIncidents]);
+
+  const displayedIncidents = tab === "active" ? activeIncidents : resolvedIncidents;
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div style={{ padding: "24px 28px" }}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+      <div style={{ marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <AlertOctagon className="w-5 h-5 text-rose-400" />
-            DevOps Incidents & Outage Center
-          </h2>
-          <p className="text-xs text-slate-400">
-            Real-time incident response queue, root-cause correlation, and post-mortem histories
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
+            Incidents
+          </h1>
+          <p style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>
+            Detected by the Synexis rule engine · auto-updated every 5s
           </p>
         </div>
-
-        <div className="flex items-center space-x-2">
-          <div className="flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-lg text-xs font-mono">
-            {(["all", "active", "resolved"] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-3 py-1 rounded-md transition-all uppercase ${
-                  filter === f
-                    ? "bg-indigo-600 text-white font-bold"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={onOpenChaosModal}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-950/60 border border-amber-500/40 text-amber-300 text-xs font-semibold hover:bg-amber-900/60 transition-colors"
-          >
-            <Flame className="w-3.5 h-3.5" />
-            <span>Simulate Outage</span>
-          </button>
+        <div style={{ textAlign: "right", fontSize: 11, color: "var(--text-muted)" }}>
+          {lastRefresh && <>Updated: {lastRefresh}</>}
         </div>
       </div>
 
-      {/* Active Incidents Section */}
-      {(filter === "all" || filter === "active") && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
-              <ShieldAlert className="w-4 h-4" />
-              Active Incidents ({data.active_incidents.length})
-            </span>
-          </div>
-
-          {data.active_incidents.length === 0 ? (
-            <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800 text-center text-slate-400 text-xs flex flex-col items-center space-y-2">
-              <CheckCircle2 className="w-8 h-8 text-emerald-400/80" />
-              <span className="font-semibold text-white">No active outages detected!</span>
-              <span className="text-slate-500 max-w-sm">
-                All cloud services, background workers, and container health checks are passing within normal parameters.
-              </span>
+      {/* Stats */}
+      {stats && (
+        <div className="grid-4" style={{ marginBottom: 20 }}>
+          {[
+            { label: "Active", value: stats.active, cls: stats.active > 0 ? "danger" : "healthy" },
+            { label: "Critical Active", value: stats.critical_active, cls: stats.critical_active > 0 ? "critical" : "healthy" },
+            { label: "Resolved Today", value: stats.resolved_today, cls: "info" },
+            { label: "Total All Time", value: stats.total, cls: "muted" },
+          ].map((s) => (
+            <div key={s.label} className="card-sm">
+              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)" }}>{s.value}</div>
+              <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3 }}>{s.label}</div>
             </div>
-          ) : (
-            data.active_incidents.map((inc) => (
-              <div
-                key={inc.id}
-                className="p-5 rounded-2xl bg-slate-900/90 border border-rose-500/50 shadow-xl shadow-rose-950/20 flex flex-col md:flex-row md:items-center justify-between gap-4"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="px-2 py-0.5 text-[9px] font-bold rounded bg-rose-950 text-rose-300 border border-rose-700 font-mono">
-                      {inc.severity}
-                    </span>
-                    <span className="text-xs font-mono text-slate-400">
-                      {inc.id} • {inc.timestamp}
-                    </span>
-                    <span className="text-xs text-indigo-400 font-mono font-bold">
-                      Confidence: {inc.confidence}%
-                    </span>
-                  </div>
-
-                  <h3 className="text-sm font-bold text-white">
-                    {inc.title}
-                  </h3>
-
-                  <p className="text-xs text-slate-300 max-w-3xl">
-                    {inc.detected_issue}
-                  </p>
-
-                  <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300 font-sans">
-                    <strong className="text-indigo-400 font-mono">AI Root Cause: </strong>
-                    {inc.probable_root_cause}
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => onInvestigate(inc)}
-                  className="shrink-0 flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-lg transition-all"
-                >
-                  <BrainCircuit className="w-4 h-4" />
-                  <span>Investigate & Fix</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))
-          )}
+          ))}
         </div>
       )}
 
-      {/* Resolved Incidents History */}
-      {(filter === "all" || filter === "resolved") && (
-        <div className="space-y-3 pt-4 border-t border-slate-800">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            Resolved Incidents & Post-Mortem Audit ({data.resolved_incidents.length})
-          </span>
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: 2, marginBottom: 16, borderBottom: "1px solid var(--border)", paddingBottom: 0 }}>
+        {(["active", "resolved"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            style={{
+              padding: "7px 16px",
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: "pointer",
+              background: "transparent",
+              border: "none",
+              color: tab === t ? "var(--text-primary)" : "var(--text-muted)",
+              borderBottom: tab === t ? "2px solid var(--accent)" : "2px solid transparent",
+              marginBottom: -1,
+              fontFamily: "var(--font-sans)",
+            }}
+          >
+            {t === "active" ? `Active (${activeIncidents.length})` : `Resolved (${resolvedIncidents.length})`}
+          </button>
+        ))}
+      </div>
 
-          <div className="space-y-2.5">
-            {data.resolved_incidents.map((r) => (
-              <div
-                key={r.id}
-                className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="px-2 py-0.2 text-[9px] font-bold rounded bg-slate-900 text-emerald-400 border border-emerald-800 font-mono">
-                      RESOLVED
-                    </span>
-                    <span className="font-mono text-slate-500 text-[11px]">
-                      {r.id} • {r.timestamp}
-                    </span>
-                  </div>
-                  <h4 className="font-semibold text-white text-xs">
-                    {r.title}
-                  </h4>
-                  <p className="text-slate-400 text-[11px]">
-                    <strong>Resolution:</strong> {r.resolution}
-                  </p>
-                </div>
-
-                <div className="shrink-0 text-right">
-                  <span className="text-[10px] text-slate-500 font-mono block">AI Verified</span>
-                  <span className="text-xs font-mono text-emerald-400 font-bold">{r.confidence}% confidence</span>
-                </div>
-              </div>
-            ))}
+      {/* Table */}
+      {loading ? (
+        <div style={{ color: "var(--text-muted)", fontSize: 13, padding: "24px 0" }}>Loading incidents…</div>
+      ) : displayedIncidents.length === 0 ? (
+        tab === "active" ? <EmptyIncidents /> : (
+          <div className="empty-state">
+            <div className="empty-state-icon">📋</div>
+            <div className="empty-state-title">No Resolved Incidents</div>
+            <div className="empty-state-desc">Resolved incidents will appear here.</div>
           </div>
+        )
+      ) : (
+        <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th style={{ width: 90 }}>Severity</th>
+                <th>Incident</th>
+                <th style={{ width: 140 }}>Status</th>
+                <th style={{ width: 160 }}>Detected</th>
+                <th style={{ width: 120 }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayedIncidents.map((inc) => (
+                <IncidentRow key={inc.id} incident={inc} onAction={handleAction} />
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
+
+      {/* Source attribution */}
+      <div style={{ marginTop: 16, fontSize: 11, color: "var(--text-muted)" }}>
+        Source: Synexis Detection Engine · Database-backed · No simulated data
+      </div>
     </div>
   );
-};
+}

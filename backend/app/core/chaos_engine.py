@@ -1,174 +1,242 @@
+"""
+chaos_engine.py  —  Real Chaos Sandbox for Synexis
+
+Operates ONLY on the synexis-* and cloudbrain-* sandbox containers.
+
+Chaos scenarios work by:
+  1. Calling the demo-app's /chaos/* HTTP endpoints (cpu, errors, memory, slow)
+     so that real container behaviour changes and real logs are emitted.
+  2. Optionally stopping a sandbox container via Docker SDK for scenarios
+     that specifically simulate a stopped service.
+
+No fake telemetry is injected.  Real Docker → real metrics → real detection.
+"""
+from __future__ import annotations
+
 import time
-import random
-from typing import Dict, Any, Optional
+from datetime import datetime
+from typing import Any, Optional
+
+import httpx
+
+from backend.app.config import settings
 from backend.app.core.container_engine import container_engine
 from backend.app.core.log_engine import log_engine
 
-CHAOS_SCENARIOS = {
-    "retry_storm": {
-        "id": "retry_storm",
-        "title": "API Infinite Retry Storm (CPU Spike 94%)",
+# ── Scenario catalogue ────────────────────────────────────────────────────────
+CHAOS_SCENARIOS: dict[str, dict[str, Any]] = {
+    "cpu_stress": {
+        "id": "cpu_stress",
+        "title": "CPU Stress — Demo App Overload",
         "category": "Compute & Performance",
-        "severity": "CRITICAL",
-        "description": "Backend API client repeatedly hits a slow endpoint without exponential backoff, causing massive CPU saturation and thread contention.",
-        "target_service": "cloudbrain-api-backend",
+        "severity": "HIGH",
+        "description": (
+            "Triggers CPU-intensive spin loops inside the demo-app container. "
+            "Docker reports rising CPU utilisation. Synexis detection "
+            "engine fires if it stays above the configured threshold."
+        ),
+        "target_service": "synexis-demo-app",
+        "action": "http_cpu",
         "symptoms": [
-            "CPU usage spikes from 14% to 94%",
-            "High rate of HTTP 504 Gateway Timeouts",
-            "Backend thread pool near exhaustion"
-        ]
+            "synexis-demo-app CPU climbs toward 100%",
+            "Demo-app logs show CHAOS INJECTED: CPU stress",
+            "Synexis detection fires cpu_sustained_high rule",
+        ],
     },
-    "db_pool_exhaustion": {
-        "id": "db_pool_exhaustion",
-        "title": "Database Connection Pool Saturation",
+    "error_burst": {
+        "id": "error_burst",
+        "title": "Error Log Burst — Database Connection Failure",
         "category": "Database & Reliability",
         "severity": "HIGH",
-        "description": "Unclosed database sessions fill up Postgres MAX_CONNECTIONS pool (100/100), rejecting all new API backend queries.",
-        "target_service": "postgres-primary-db",
+        "description": (
+            "Switches the demo-app into error-injection mode. All API routes "
+            "return 5xx responses and emit connection-error logs. "
+            "Synexis log engine classifies these as ERROR/CRITICAL and the "
+            "detection engine fires the error_burst rule."
+        ),
+        "target_service": "synexis-demo-app",
+        "action": "http_errors",
         "symptoms": [
-            "Database active connections: 100/100 (100%)",
-            "Backend logs show 'FATAL: remaining connection slots reserved'",
-            "API response latency jumps to > 8,500ms"
-        ]
+            "Demo-app API routes return 503/500",
+            "Logs show psycopg2 OperationalError, FATAL connection errors",
+            "Synexis detection fires error_burst rule",
+        ],
     },
-    "memory_leak_oom": {
-        "id": "memory_leak_oom",
-        "title": "Memory Leak & OOM (Out-Of-Memory) Crash",
+    "memory_pressure": {
+        "id": "memory_pressure",
+        "title": "Memory Pressure — Gradual Leak",
         "category": "Memory & Stability",
+        "severity": "HIGH",
+        "description": (
+            "Triggers the demo-app to allocate large byte arrays, simulating a "
+            "memory leak. Docker reports rising container memory. "
+            "Logs show OOM-killer warnings."
+        ),
+        "target_service": "synexis-demo-app",
+        "action": "http_memory",
+        "symptoms": [
+            "synexis-demo-app memory climbs",
+            "Logs show memory utilization exceeded 80% threshold",
+            "On repeated triggers: OOM-killer log appears",
+        ],
+    },
+    "slow_responses": {
+        "id": "slow_responses",
+        "title": "Slow Responses — Artificial Latency",
+        "category": "Networking & Performance",
+        "severity": "MEDIUM",
+        "description": (
+            "Adds 2–6 s artificial latency to every API response inside the "
+            "demo-app. Logs report slow query warnings."
+        ),
+        "target_service": "synexis-demo-app",
+        "action": "http_slow",
+        "symptoms": [
+            "Demo-app API latency 2–6 seconds",
+            "Logs show slow query warnings",
+        ],
+    },
+    "db_stop": {
+        "id": "db_stop",
+        "title": "Database Stopped — Container Failure",
+        "category": "Database & Reliability",
         "severity": "CRITICAL",
-        "description": "Worker service leaks unbounded memory on file ingestion, hitting 1024MB ceiling and receiving SIGKILL from Linux OOM Killer.",
-        "target_service": "cloudbrain-async-worker",
+        "description": (
+            "Stops the database container via Docker SDK. "
+            "Synexis detection engine fires the container_stopped rule "
+            "within 5–10 seconds and creates a CRITICAL incident."
+        ),
+        "target_service": "synexis-postgres",
+        "action": "docker_stop",
         "symptoms": [
-            "Memory climbs rapidly from 290MB to 1,024MB",
-            "Worker status transitions to 'unhealthy' / 'exited'",
-            "Restart count increments automatically"
-        ]
+            "synexis-postgres status: exited",
+            "Synexis detection fires container_stopped rule",
+            "Incident created with severity CRITICAL",
+        ],
     },
-    "port_collision": {
-        "id": "port_collision",
-        "title": "Host Port Collision (Port 8000 Occupied)",
-        "category": "Networking & Deployment",
-        "severity": "HIGH",
-        "description": "New backend replica fails to bind to port 0.0.0.0:8000 because another zombie process is already listening.",
-        "target_service": "cloudbrain-api-backend",
-        "symptoms": [
-            "Errno 98: Address already in use",
-            "Container startup aborts with exit code 1",
-            "Service deployment marked FAILED"
-        ]
-    },
-    "crashloop_backoff": {
-        "id": "crashloop_backoff",
-        "title": "Missing Config Secret (CrashLoopBackOff)",
-        "category": "Configuration & Secrets",
-        "severity": "HIGH",
-        "description": "Service crashes during boot because mandatory environment variable 'JWT_SECRET_KEY' is missing or empty.",
-        "target_service": "cloudbrain-nextjs-ui",
-        "symptoms": [
-            "Container restarts 5 times within 60 seconds",
-            "KeyError: 'JWT_SECRET_KEY is required in production'",
-            "Frontend state displays DEGRADED"
-        ]
-    }
 }
 
+
 class ChaosEngine:
-    def __init__(self):
+    def __init__(self) -> None:
         self.active_scenario: Optional[str] = None
         self.started_at: Optional[float] = None
+        self._demo_url: str = settings.SANDBOX_DEMO_URL  # e.g. http://localhost:5050
 
-    def get_scenarios(self) -> Dict[str, Any]:
+    # ── Public API ────────────────────────────────────────────────────────────
+
+    def get_scenarios(self) -> dict[str, Any]:
         return {
             "active_scenario": self.active_scenario,
-            "scenarios": list(CHAOS_SCENARIOS.values())
+            "scenarios": list(CHAOS_SCENARIOS.values()),
         }
 
-    def trigger_scenario(self, scenario_id: str) -> Dict[str, Any]:
+    def trigger_scenario(self, scenario_id: str) -> dict[str, Any]:
         if scenario_id not in CHAOS_SCENARIOS:
             raise ValueError(f"Unknown scenario '{scenario_id}'")
 
+        scenario = CHAOS_SCENARIOS[scenario_id]
+        action = scenario["action"]
+
         self.active_scenario = scenario_id
         self.started_at = time.time()
-        scenario = CHAOS_SCENARIOS[scenario_id]
+        result_detail: str = ""
 
-        if scenario_id == "retry_storm":
-            container_engine.mutate_for_chaos("c-backend", {
-                "cpu_percent": 94.2,
-                "memory_mb": 780.0,
-                "state": "degraded"
-            })
-            for _ in range(8):
-                log_engine.add_log("ERROR", "backend", "HTTP 504 Gateway Timeout on upstream service /v1/payments")
-                log_engine.add_log("WARN", "backend", "API retry attempt 3/5 with 0ms delay (no exponential backoff configured)")
-                log_engine.add_log("ERROR", "backend", "Thread starvation detected: 98/100 worker threads blocked on socket read")
+        # ── HTTP-based chaos (demo-app endpoints) ─────────────────────────────
+        if action == "http_cpu":
+            result_detail = self._call_demo_chaos("/chaos/cpu")
 
-        elif scenario_id == "db_pool_exhaustion":
-            container_engine.mutate_for_chaos("c-database", {
-                "cpu_percent": 88.5,
-                "memory_mb": 1820.0,
-                "state": "unhealthy"
-            })
-            for _ in range(6):
-                log_engine.add_log("ERROR", "database", "FATAL: remaining connection slots are reserved for non-replication superuser connections")
-                log_engine.add_log("ERROR", "backend", "psycopg2.OperationalError: could not connect to server: Connection timed out")
-                log_engine.add_log("WARN", "database", "Connection pool exhausted: 100/100 active connections in 'idle in transaction' state")
+        elif action == "http_errors":
+            result_detail = self._call_demo_chaos("/chaos/errors")
 
-        elif scenario_id == "memory_leak_oom":
-            container_engine.mutate_for_chaos("c-worker", {
-                "cpu_percent": 35.0,
-                "memory_mb": 1024.0,
-                "status": "stopped",
-                "state": "exited",
-                "restart_count": 3
-            })
-            log_engine.add_log("WARN", "worker", "Memory utilization exceeded 90% threshold (940MB / 1024MB)")
-            log_engine.add_log("CRITICAL", "worker", "Kernel OOM-killer invoked: Killed process 8912 (celery worker) total-vm:1048576kB, anon-rss:1044480kB")
-            log_engine.add_log("ERROR", "worker", "Container exited with status code 137 (SIGKILL OOM)")
+        elif action == "http_memory":
+            result_detail = self._call_demo_chaos("/chaos/memory")
 
-        elif scenario_id == "port_collision":
-            container_engine.mutate_for_chaos("c-backend", {
-                "status": "stopped",
-                "state": "exited",
-                "cpu_percent": 0.0
-            })
-            log_engine.add_log("CRITICAL", "backend", "OSError: [Errno 98] Address already in use: '0.0.0.0:8000'")
-            log_engine.add_log("ERROR", "backend", "Failed to bind socket. Another process (PID 4192) is listening on port 8000")
-            log_engine.add_log("ERROR", "frontend", "Upstream API server unreachable at http://api:8000 (ECONNREFUSED)")
+        elif action == "http_slow":
+            result_detail = self._call_demo_chaos("/chaos/slow")
 
-        elif scenario_id == "crashloop_backoff":
-            container_engine.mutate_for_chaos("c-frontend", {
-                "state": "unhealthy",
-                "restart_count": 5,
-                "cpu_percent": 2.0
-            })
-            for _ in range(5):
-                log_engine.add_log("CRITICAL", "frontend", "RuntimeError: Environment variable 'JWT_SECRET_KEY' is missing in production mode")
-                log_engine.add_log("WARN", "frontend", "Container restarting (backoff: 10s)")
+        # ── Docker-based chaos (real container lifecycle) ─────────────────────
+        elif action == "docker_stop":
+            target = scenario["target_service"]
+            try:
+                # Try target or cloudbrain- fallback
+                try:
+                    container_engine.stop_container(target)
+                    result_detail = f"Container '{target}' stopped via Docker SDK."
+                except Exception:
+                    alt_target = target.replace("synexis-", "cloudbrain-")
+                    container_engine.stop_container(alt_target)
+                    result_detail = f"Container '{alt_target}' stopped via Docker SDK."
+            except Exception as exc:
+                result_detail = f"Docker stop attempted: {exc}"
+
+        # Write a system log entry so detection engine can pick it up
+        log_engine.add_log(
+            "INFO",
+            scenario["target_service"],
+            f"[CHAOS] Scenario '{scenario['title']}' injected at {datetime.now(timezone.utc).isoformat()}",
+            metadata={"source": "chaos_engine", "scenario_id": scenario_id},
+        )
 
         return {
             "status": "triggered",
             "scenario": scenario,
-            "message": f"Injected chaos scenario: '{scenario['title']}'"
+            "detail": result_detail,
+            "started_at": self.started_at,
+            "message": f"Chaos scenario '{scenario['title']}' is now active.",
         }
 
-    def reset_chaos(self) -> Dict[str, Any]:
-        prev_scenario = self.active_scenario
+    def reset_chaos(self) -> dict[str, Any]:
+        prev = self.active_scenario
+        prev_scenario = CHAOS_SCENARIOS.get(prev, {}) if prev else {}
         self.active_scenario = None
         self.started_at = None
 
-        # Reset all containers to healthy defaults
-        for cid in ["c-backend", "c-frontend", "c-database", "c-redis", "c-worker"]:
-            container_engine.restart_container(cid)
+        results: list[str] = []
 
+        # 1. Reset demo-app chaos (always safe to call)
+        results.append(self._call_demo_chaos("/chaos/reset"))
+
+        # 2. Start any container that was stopped by a docker_stop scenario
+        if prev_scenario.get("action") == "docker_stop":
+            target = prev_scenario.get("target_service", "")
+            if target:
+                try:
+                    try:
+                        container_engine.start_container(target)
+                        results.append(f"Container '{target}' started.")
+                    except Exception:
+                        alt_target = target.replace("synexis-", "cloudbrain-")
+                        container_engine.start_container(alt_target)
+                        results.append(f"Container '{alt_target}' started.")
+                except Exception as exc:
+                    results.append(f"Could not start '{target}': {exc}")
+
+        # 3. Clear in-memory log buffer so stale errors do not linger
         log_engine.clear_logs()
-        log_engine.add_log("INFO", "backend", "System chaos resolved. Telemetry baselines restored to normal parameters.")
-        log_engine.add_log("INFO", "database", "All connections cleared and operating within normal pool capacity (12/100).")
-        log_engine.add_log("INFO", "worker", "Worker restarted cleanly with baseline memory footprint (240MB).")
 
         return {
             "status": "reset",
-            "previous_scenario": prev_scenario,
-            "message": "All failure scenarios cleared. Infrastructure operating normally."
+            "previous_scenario": prev,
+            "results": results,
+            "message": "All chaos scenarios cleared. Containers restoring to normal.",
         }
+
+    # ── Internal helpers ──────────────────────────────────────────────────────
+
+    def _call_demo_chaos(self, path: str) -> str:
+        """POST to the demo-app container's chaos endpoint."""
+        url = f"{self._demo_url}{path}"
+        try:
+            with httpx.Client(timeout=5.0) as client:
+                resp = client.post(url)
+            if resp.status_code < 400:
+                return f"POST {url} → {resp.status_code} OK"
+            return f"POST {url} → {resp.status_code} {resp.text[:120]}"
+        except httpx.ConnectError:
+            return f"Demo-app unreachable at {url} (is the sandbox running?)"
+        except Exception as exc:
+            return f"HTTP call failed: {exc}"
+
 
 chaos_engine = ChaosEngine()

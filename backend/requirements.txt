@@ -5,3 +5,18 @@ pydantic>=2.6.0
 pyyaml>=6.0.1
 python-dotenv>=1.0.1
 httpx>=0.27.0
+
+# Docker integration
+docker>=7.0.0
+
+# Database — SQLite built-in for dev; swap DATABASE_URL for PostgreSQL in .env
+sqlalchemy>=2.0.0
+aiosqlite>=0.20.0
+alembic>=1.13.0
+
+# PostgreSQL driver (required when DATABASE_URL=postgresql://...)
+psycopg2-binary>=2.9.0
+
+# AI providers — set GEMINI_API_KEY or OPENAI_API_KEY in .env to enable
+google-generativeai>=0.8.0
+openai>=1.30.0
