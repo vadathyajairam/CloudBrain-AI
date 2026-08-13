@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="100%" height="100%">
+  <defs>
+    <style>
+      .app-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 16px; fill: #0f172a; }
+      .nav-item { font-family: 'Inter', -apple-system, sans-serif; font-weight: 500; font-size: 13px; fill: #64748b; }
+      .nav-active { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 13px; fill: #4f46e5; }
+      .card-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 12px; fill: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+      .metric-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 24px; fill: #0f172a; }
+      .metric-sub { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #64748b; }
+      .provenance { font-family: 'Inter', -apple-system, sans-serif; font-size: 10px; fill: #4338ca; font-weight: 500; }
+      .table-hdr { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 11px; fill: #64748b; }
+      .table-cell { font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #1e293b; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="750" fill="#f8fafc" />
+
+  <!-- Top Navbar -->
+  <rect width="1200" height="56" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <rect x="24" y="16" width="24" height="24" rx="6" fill="#4f46e5" />
+  <text x="36" y="33" text-anchor="middle" font-family="Inter" font-weight="800" font-size="14" fill="#ffffff">S</text>
+  <text x="56" y="33" class="app-title">Synexis</text>
+  <rect x="125" y="18" width="115" height="20" rx="10" fill="#eef2ff" />
+  <text x="182" y="32" text-anchor="middle" class="provenance">SYSTEM HEALTHY</text>
+
+  <!-- Sidebar -->
+  <rect y="56" width="220" height="694" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <rect x="12" y="70" width="196" height="34" rx="6" fill="#eef2ff" />
+  <text x="28" y="92" class="nav-active">📊 Dashboard</text>
+  <text x="28" y="130" class="nav-item">📈 Host Telemetry</text>
+  <text x="28" y="165" class="nav-item">🐳 Containers</text>
+  <text x="28" y="200" class="nav-item">📜 Log Stream</text>
+  <text x="28" y="235" class="nav-item">🚨 Incidents (0)</text>
+  <text x="28" y="270" class="nav-item">🧠 AI Root Cause</text>
+  <text x="28" y="305" class="nav-item">⚡ Chaos Lab</text>
+  <text x="28" y="340" class="nav-item">🔧 Remediation &amp; Audit</text>
+  <text x="28" y="375" class="nav-item">🤖 DevOps Copilot</text>
+  <text x="28" y="410" class="nav-item">🔌 Data Sources</text>
+
+  <!-- Main Content Area -->
+  <!-- Top Metric Cards -->
+  <!-- Card 1: CPU -->
+  <rect x="245" y="75" width="220" height="110" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <text x="265" y="100" class="card-title">CPU Utilization</text>
+  <text x="265" y="135" class="metric-val">18.4%</text>
+  <text x="265" y="160" class="metric-sub">Source: psutil (8 cores)</text>
+  <path d="M 370 145 Q 400 120 420 135 T 450 125" fill="none" stroke="#10b981" stroke-width="2" />
+
+  <!-- Card 2: Memory -->
+  <rect x="480" y="75" width="220" height="110" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <text x="500" y="100" class="card-title">Memory Allocation</text>
+  <text x="500" y="135" class="metric-val">54.2%</text>
+  <text x="500" y="160" class="metric-sub">8.67 / 16.00 GB RAM</text>
+  <path d="M 605 145 Q 635 130 655 140 T 685 130" fill="none" stroke="#6366f1" stroke-width="2" />
+
+  <!-- Card 3: Containers -->
+  <rect x="715" y="75" width="220" height="110" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <text x="735" y="100" class="card-title">Docker Sandbox</text>
+  <text x="735" y="135" class="metric-val">3 / 3</text>
+  <text x="735" y="160" class="metric-sub">All synexis-* healthy</text>
+  <circle cx="910" cy="130" r="8" fill="#10b981" />
+
+  <!-- Card 4: Incidents -->
+  <rect x="950" y="75" width="225" height="110" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <text x="970" y="100" class="card-title">Active Incidents</text>
+  <text x="970" y="135" class="metric-val" fill="#16a34a">0</text>
+  <text x="970" y="160" class="metric-sub">Cluster operating nominally</text>
+
+  <!-- Live Telemetry Chart Panel -->
+  <rect x="245" y="205" width="690" height="260" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <text x="265" y="235" class="card-title">Live Host Compute Telemetry (Buffer: 60 Samples / 3s Interval)</text>
+  <line x1="265" y1="255" x2="915" y2="255" stroke="#f1f5f9" />
+  <line x1="265" y1="315" x2="915" y2="315" stroke="#f1f5f9" />
+  <line x1="265" y1="375" x2="915" y2="375" stroke="#f1f5f9" />
+  <line x1="265" y1="435" x2="915" y2="435" stroke="#f1f5f9" />
+  <!-- Polyline for CPU -->
+  <path d="M 270 410 L 320 415 L 370 395 L 420 405 L 470 380 L 520 390 L 570 375 L 620 385 L 670 360 L 720 370 L 770 390 L 820 400 L 870 395 L 910 400" fill="none" stroke="#10b981" stroke-width="2.5" />
+  <!-- Polyline for RAM -->
+  <path d="M 270 325 L 320 325 L 370 323 L 420 327 L 470 325 L 520 324 L 570 326 L 620 325 L 670 323 L 720 325 L 770 324 L 820 326 L 870 325 L 910 325" fill="none" stroke="#6366f1" stroke-width="2.5" />
+  <text x="270" y="455" class="metric-sub">• CPU Utilization (%)</text>
+  <text x="400" y="455" class="metric-sub" fill="#6366f1">• Memory Allocated (%)</text>
+
+  <!-- System Health Matrix Panel -->
+  <rect x="950" y="205" width="225" height="260" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <text x="970" y="235" class="card-title">Subsystem Health</text>
+  <circle cx="975" cy="270" r="4" fill="#10b981" /><text x="990" y="274" class="table-cell">Docker Engine</text>
+  <circle cx="975" cy="305" r="4" fill="#10b981" /><text x="990" y="309" class="table-cell">PostgreSQL 15</text>
+  <circle cx="975" cy="340" r="4" fill="#10b981" /><text x="990" y="344" class="table-cell">Redis 7 Cache</text>
+  <circle cx="975" cy="375" r="4" fill="#10b981" /><text x="990" y="379" class="table-cell">Demo App Gateway</text>
+  <circle cx="975" cy="410" r="4" fill="#10b981" /><text x="990" y="414" class="table-cell">Vector RAG Store</text>
+  <circle cx="975" cy="445" r="4" fill="#10b981" /><text x="990" y="449" class="table-cell">FastAPI Lifespan</text>
+
+  <!-- Container Overview Table (Bottom) -->
+  <rect x="245" y="480" width="930" height="245" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <text x="265" y="510" class="card-title">Live Docker Sandbox Cluster Fleet</text>
+  <line x1="245" y1="525" x2="1175" y2="525" stroke="#e2e8f0" />
+  <text x="265" y="545" class="table-hdr">CONTAINER</text>
+  <text x="450" y="545" class="table-hdr">IMAGE</text>
+  <text x="630" y="545" class="table-hdr">STATUS</text>
+  <text x="750" y="545" class="table-hdr">HEALTH</text>
+  <text x="870" y="545" class="table-hdr">CPU / RAM</text>
+  <text x="1040" y="545" class="table-hdr">RESTARTS</text>
+
+  <!-- Row 1 -->
+  <text x="265" y="580" class="table-cell" font-weight="700">synexis-demo-app</text>
+  <text x="450" y="580" class="table-cell">sandbox-demo:latest</text>
+  <text x="630" y="580" class="table-cell" fill="#16a34a">RUNNING</text>
+  <text x="750" y="580" class="table-cell" fill="#16a34a">HEALTHY</text>
+  <text x="870" y="580" class="table-cell">2.1% / 48 MB</text>
+  <text x="1040" y="580" class="table-cell">0</text>
+
+  <!-- Row 2 -->
+  <text x="265" y="625" class="table-cell" font-weight="700">synexis-postgres</text>
+  <text x="450" y="625" class="table-cell">postgres:15-alpine</text>
+  <text x="630" y="625" class="table-cell" fill="#16a34a">RUNNING</text>
+  <text x="750" y="625" class="table-cell" fill="#16a34a">HEALTHY</text>
+  <text x="870" y="625" class="table-cell">0.8% / 94 MB</text>
+  <text x="1040" y="625" class="table-cell">0</text>
+
+  <!-- Row 3 -->
+  <text x="265" y="670" class="table-cell" font-weight="700">synexis-redis</text>
+  <text x="450" y="670" class="table-cell">redis:7-alpine</text>
+  <text x="630" y="670" class="table-cell" fill="#16a34a">RUNNING</text>
+  <text x="750" y="670" class="table-cell" fill="#16a34a">HEALTHY</text>
+  <text x="870" y="670" class="table-cell">0.4% / 28 MB</text>
+  <text x="1040" y="670" class="table-cell">0</text>
+</svg>

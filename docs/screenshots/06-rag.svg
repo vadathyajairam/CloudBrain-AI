@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="100%" height="100%">
+  <defs>
+    <style>
+      .modal-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 16px; fill: #0f172a; }
+      .section-hdr { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 12px; fill: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+      .doc-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 14px; fill: #1e293b; }
+      .doc-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #64748b; }
+      .doc-body { font-family: 'Inter', -apple-system, sans-serif; font-size: 12px; fill: #334155; line-height: 1.6; }
+      .score-badge { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 12px; fill: #16a34a; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="750" fill="#0f172a" fill-opacity="0.6" />
+
+  <!-- Modal Box -->
+  <rect x="150" y="40" width="900" height="670" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+
+  <!-- Modal Header -->
+  <rect x="150" y="40" width="900" height="65" rx="12" fill="#f8fafc" />
+  <line x1="150" y1="105" x2="1050" y2="105" stroke="#e2e8f0" />
+  <rect x="180" y="58" width="85" height="24" rx="4" fill="#fff1f2" stroke="#fecdd3" />
+  <text x="222" y="74" text-anchor="middle" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#be123c">INC-00042</text>
+  <text x="280" y="76" class="modal-title">Vector RAG Knowledge Retrieval &amp; Runbook Citations</text>
+  <rect x="940" y="58" width="85" height="24" rx="4" fill="#f1f5f9" /><text x="982" y="74" text-anchor="middle" font-family="Inter" font-size="11" font-weight="600" fill="#64748b">Close [ESC]</text>
+
+  <!-- Evidence Tabs -->
+  <rect x="180" y="120" width="840" height="35" rx="6" fill="#f1f5f9" />
+  <text x="262" y="142" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#64748b">1. Evidence Bundle</text>
+  <rect x="345" y="122" width="160" height="31" rx="5" fill="#ffffff" />
+  <text x="425" y="142" text-anchor="middle" font-family="Inter" font-size="12" font-weight="700" fill="#4f46e5">2. RAG Runbooks</text>
+  <text x="590" y="142" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#64748b">3. AI RCA Diagnosis</text>
+  <text x="760" y="142" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#64748b">4. Remediation &amp; 4-Point Check</text>
+
+  <!-- Query Vectorization Info -->
+  <rect x="180" y="170" width="840" height="50" rx="8" fill="#eef2ff" stroke="#c7d2fe" />
+  <text x="200" y="192" font-family="Inter" font-size="11" font-weight="600" fill="#3730a3">Dense Vector Query:</text>
+  <text x="330" y="192" font-family="JetBrains Mono" font-size="11" fill="#4338ca">"PostgreSQL database connection refused synexis-postgres container stopped socket timeout"</text>
+  <text x="200" y="210" font-family="JetBrains Mono" font-size="10" fill="#6366f1">128-D Dense Embeddings • Sublinear TF-IDF (1 + ln(1+tf)) • Hybrid Ranker: 0.60 Cosine + 0.40 BM25</text>
+
+  <!-- Retrieved Runbook Card (Top Match) -->
+  <rect x="180" y="235" width="840" height="210" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <rect x="180" y="235" width="840" height="40" rx="8" fill="#f8fafc" />
+  <line x1="180" y1="275" x2="1020" y2="275" stroke="#e2e8f0" />
+
+  <text x="200" y="260" class="doc-title">RUNBOOK-DB-03: PostgreSQL Database Connection Failure &amp; Pool Exhaustion</text>
+  <rect x="890" y="245" width="115" height="22" rx="4" fill="#f0fdf4" stroke="#bbf7d0" />
+  <text x="947" y="260" text-anchor="middle" class="score-badge">91.2% MATCH</text>
+
+  <text x="200" y="295" class="doc-meta">Category: Troubleshooting Runbook • Chunk Index: #02 (Tokens: 214) • Vector Similarity: 0.874</text>
+
+  <rect x="200" y="310" width="800" height="115" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="215" y="335" class="doc-body"><tspan font-weight="700">Diagnostic Guidance:</tspan> When application logs emit repeated 'psycopg2.OperationalError: Connection refused'</text>
+  <text x="215" y="355" class="doc-body">targeting TCP port 5432, first inspect the daemon process state. If the container is in an exited state (Exit 0 or 137),</text>
+  <text x="215" y="375" class="doc-body">the database daemon has terminated and cannot accept TCP sockets. Executing an authorized <tspan font-family="JetBrains Mono" font-weight="600">restart_container</tspan></text>
+  <text x="215" y="395" class="doc-body">re-initializes the PostgreSQL postmaster process and clears orphan connection locks.</text>
+
+  <!-- Retrieved Runbook Card 2 (Secondary Match) -->
+  <rect x="180" y="460" width="840" height="120" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <text x="200" y="490" class="doc-title">GUIDE-DOCKER-01: Docker Container Lifecycle &amp; Crash Recovery Protocols</text>
+  <rect x="890" y="475" width="115" height="22" rx="4" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="947" y="490" text-anchor="middle" font-family="JetBrains Mono" font-size="11" font-weight="600" fill="#64748b">78.6% MATCH</text>
+  <text x="200" y="515" class="doc-meta">Category: Architecture Guide • Vector Similarity: 0.761</text>
+  <text x="200" y="540" font-family="Inter" font-size="11" fill="#475569">Containers stopped due to external signals or memory pressure must be restarted and verified via healthcheck.</text>
+
+  <!-- Footer Actions -->
+  <rect x="180" y="600" width="840" height="45" rx="8" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="200" y="628" font-family="Inter" font-size="12" fill="#64748b">2 Grounded Knowledge Citations Passed to AI Diagnostic Context</text>
+  <rect x="840" y="608" width="165" height="30" rx="6" fill="#4f46e5" />
+  <text x="922" y="627" text-anchor="middle" font-family="Inter" font-size="11" font-weight="600" fill="#ffffff">Proceed to AI RCA →</text>
+</svg>

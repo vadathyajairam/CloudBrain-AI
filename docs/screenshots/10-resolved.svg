@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="100%" height="100%">
+  <defs>
+    <style>
+      .app-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 16px; fill: #0f172a; }
+      .nav-item { font-family: 'Inter', -apple-system, sans-serif; font-weight: 500; font-size: 13px; fill: #64748b; }
+      .nav-active { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 13px; fill: #4f46e5; }
+      .view-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 18px; fill: #0f172a; }
+      .view-sub { font-family: 'Inter', -apple-system, sans-serif; font-size: 12px; fill: #64748b; }
+      .table-hdr { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 11px; fill: #64748b; }
+      .table-cell { font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #1e293b; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="750" fill="#f8fafc" />
+
+  <!-- Navbar -->
+  <rect width="1200" height="56" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <rect x="24" y="16" width="24" height="24" rx="6" fill="#4f46e5" />
+  <text x="36" y="33" text-anchor="middle" font-family="Inter" font-weight="800" font-size="14" fill="#ffffff">S</text>
+  <text x="56" y="33" class="app-title">Synexis</text>
+  <rect x="125" y="18" width="115" height="20" rx="10" fill="#f0fdf4" stroke="#bbf7d0" />
+  <text x="182" y="32" text-anchor="middle" font-family="Inter" font-size="10" font-weight="600" fill="#15803d">ALL RESOLVED</text>
+
+  <!-- Sidebar -->
+  <rect y="56" width="220" height="694" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <text x="28" y="92" class="nav-item">📊 Dashboard</text>
+  <text x="28" y="130" class="nav-item">📈 Host Telemetry</text>
+  <text x="28" y="165" class="nav-item">🐳 Containers (3/3)</text>
+  <text x="28" y="200" class="nav-item">📜 Log Stream</text>
+  <rect x="12" y="215" width="196" height="34" rx="6" fill="#eef2ff" />
+  <text x="28" y="237" class="nav-active">🚨 Incidents (0)</text>
+  <text x="28" y="272" class="nav-item">🧠 AI Root Cause</text>
+  <text x="28" y="307" class="nav-item">⚡ Chaos Lab</text>
+  <text x="28" y="342" class="nav-item">🔧 Remediation &amp; Audit</text>
+  <text x="28" y="377" class="nav-item">🤖 DevOps Copilot</text>
+  <text x="28" y="412" class="nav-item">🔌 Data Sources</text>
+
+  <!-- Main Area -->
+  <text x="245" y="95" class="view-title">Incident Detection &amp; Lifecycle Management</text>
+  <text x="245" y="115" class="view-sub">Real-time anomaly evaluation rules, persistent state transitions, and automated post-mortem indexing</text>
+
+  <!-- Resolved Incident Table -->
+  <rect x="245" y="145" width="930" height="570" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <rect x="245" y="145" width="930" height="40" rx="8" fill="#f8fafc" />
+  <line x1="245" y1="185" x2="1175" y2="185" stroke="#e2e8f0" />
+
+  <text x="265" y="170" class="table-hdr">INCIDENT ID</text>
+  <text x="380" y="170" class="table-hdr">TITLE &amp; RESOLUTION SUMMARY</text>
+  <text x="690" y="170" class="table-hdr">TARGET</text>
+  <text x="810" y="170" class="table-hdr">SEVERITY</text>
+  <text x="910" y="170" class="table-hdr">STATUS</text>
+  <text x="1030" y="170" class="table-hdr">POST-MORTEM</text>
+
+  <!-- Row 1: INC-00042 (Resolved) -->
+  <circle cx="270" cy="225" r="4" fill="#16a34a" />
+  <text x="285" y="230" class="table-cell" font-weight="700">INC-00042</text>
+  <text x="380" y="222" class="table-cell" font-weight="700">Database Stopped — synexis-postgres</text>
+  <text x="380" y="240" font-family="Inter" font-size="11" fill="#15803d">Resolved via restart_container by sre_operator • 4/4 Health Checks PASSED</text>
+  <text x="690" y="230" class="table-cell">synexis-postgres</text>
+  <rect x="805" y="215" width="70" height="20" rx="4" fill="#fff1f2" /><text x="840" y="229" text-anchor="middle" class="table-cell" fill="#be123c" font-size="10" font-weight="700">CRITICAL</text>
+  <rect x="905" y="215" width="75" height="20" rx="4" fill="#f0fdf4" stroke="#bbf7d0" /><text x="942" y="229" text-anchor="middle" class="table-cell" fill="#15803d" font-size="10" font-weight="700">RESOLVED</text>
+  <rect x="1025" y="215" width="105" height="24" rx="4" fill="#eef2ff" stroke="#c7d2fe" />
+  <text x="1077" y="231" text-anchor="middle" font-family="Inter" font-size="11" font-weight="600" fill="#3730a3">Indexed in RAG</text>
+  <line x1="245" y1="265" x2="1175" y2="265" stroke="#f1f5f9" />
+
+  <!-- Row 2: INC-00041 -->
+  <circle cx="270" cy="305" r="4" fill="#16a34a" />
+  <text x="285" y="310" class="table-cell" font-weight="700">INC-00041</text>
+  <text x="380" y="302" class="table-cell" font-weight="700">CPU Spike — synexis-demo-app</text>
+  <text x="380" y="320" font-family="Inter" font-size="11" fill="#15803d">Resolved automatically; CPU utilization returned below 90% threshold</text>
+  <text x="690" y="310" class="table-cell">synexis-demo-app</text>
+  <rect x="805" y="295" width="70" height="20" rx="4" fill="#fffbeb" /><text x="840" y="309" text-anchor="middle" class="table-cell" fill="#b45309" font-size="10" font-weight="700">HIGH</text>
+  <rect x="905" y="295" width="75" height="20" rx="4" fill="#f0fdf4" stroke="#bbf7d0" /><text x="942" y="309" text-anchor="middle" class="table-cell" fill="#15803d" font-size="10" font-weight="700">RESOLVED</text>
+  <rect x="1025" y="295" width="105" height="24" rx="4" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="1077" y="311" text-anchor="middle" font-family="Inter" font-size="11" font-weight="600" fill="#64748b">View Details</text>
+</svg>

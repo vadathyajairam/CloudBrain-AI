@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="100%" height="100%">
+  <defs>
+    <style>
+      .app-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 16px; fill: #0f172a; }
+      .nav-item { font-family: 'Inter', -apple-system, sans-serif; font-weight: 500; font-size: 13px; fill: #64748b; }
+      .nav-active { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 13px; fill: #4f46e5; }
+      .view-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 18px; fill: #0f172a; }
+      .view-sub { font-family: 'Inter', -apple-system, sans-serif; font-size: 12px; fill: #64748b; }
+      .chat-user { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 13px; fill: #ffffff; }
+      .chat-ai { font-family: 'Inter', -apple-system, sans-serif; font-size: 12px; fill: #1e293b; line-height: 1.6; }
+      .code-tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #4338ca; font-weight: 600; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="750" fill="#f8fafc" />
+
+  <!-- Navbar -->
+  <rect width="1200" height="56" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <rect x="24" y="16" width="24" height="24" rx="6" fill="#4f46e5" />
+  <text x="36" y="33" text-anchor="middle" font-family="Inter" font-weight="800" font-size="14" fill="#ffffff">S</text>
+  <text x="56" y="33" class="app-title">Synexis</text>
+
+  <!-- Sidebar -->
+  <rect y="56" width="220" height="694" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <text x="28" y="92" class="nav-item">📊 Dashboard</text>
+  <text x="28" y="130" class="nav-item">📈 Host Telemetry</text>
+  <text x="28" y="165" class="nav-item">🐳 Containers</text>
+  <text x="28" y="200" class="nav-item">📜 Log Stream</text>
+  <text x="28" y="235" class="nav-item">🚨 Incidents</text>
+  <text x="28" y="270" class="nav-item">🧠 AI Root Cause</text>
+  <text x="28" y="305" class="nav-item">⚡ Chaos Lab</text>
+  <text x="28" y="340" class="nav-item">🔧 Remediation &amp; Audit</text>
+  <rect x="12" y="360" width="196" height="34" rx="6" fill="#eef2ff" />
+  <text x="28" y="382" class="nav-active">🤖 DevOps Copilot</text>
+  <text x="28" y="417" class="nav-item">🔌 Data Sources</text>
+
+  <!-- Main Area -->
+  <text x="245" y="95" class="view-title">Synexis DevOps AI Copilot</text>
+  <text x="245" y="115" class="view-sub">Conversational SRE assistant grounded in live telemetry, active incident evidence, and vector RAG knowledge</text>
+
+  <!-- Chat Container -->
+  <rect x="245" y="140" width="930" height="570" rx="10" fill="#ffffff" stroke="#e2e8f0" />
+
+  <!-- Chat Context Strip -->
+  <rect x="245" y="140" width="930" height="40" rx="10" fill="#f8fafc" />
+  <line x1="245" y1="180" x2="1175" y2="180" stroke="#e2e8f0" />
+  <circle cx="270" cy="160" r="4" fill="#10b981" />
+  <text x="285" y="164" font-family="Inter" font-size="11" font-weight="600" fill="#475569">Grounded Context Active: Live Cluster Telemetry • Incident INC-00042 • RUNBOOK-DB-03 Citations</text>
+
+  <!-- User Message (Right Aligned Bubble) -->
+  <rect x="730" y="200" width="420" height="45" rx="8" fill="#4f46e5" />
+  <text x="750" y="228" class="chat-user">Why did PostgreSQL fail during the latest incident?</text>
+
+  <!-- AI Copilot Response (Left Aligned Bubble) -->
+  <rect x="270" y="265" width="880" height="360" rx="8" fill="#f8fafc" stroke="#e2e8f0" />
+  <circle cx="300" cy="295" r="14" fill="#4338ca" />
+  <text x="300" y="300" text-anchor="middle" font-family="Inter" font-weight="800" font-size="11" fill="#ffffff">AI</text>
+  <text x="325" y="300" font-family="Inter" font-size="13" font-weight="700" fill="#0f172a">Synexis Copilot</text>
+  <rect x="430" y="288" width="115" height="20" rx="4" fill="#eef2ff" stroke="#c7d2fe" />
+  <text x="487" y="302" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#3730a3">GROUNDED RCA</text>
+
+  <text x="300" y="340" class="chat-ai">Based on live incident <tspan class="code-tag">INC-00042</tspan> telemetry and retrieved runbook <tspan class="code-tag">RUNBOOK-DB-03</tspan>, here is the diagnostic breakdown:</text>
+
+  <text x="300" y="375" class="chat-ai"><tspan font-weight="700">1. Root Cause Summary:</tspan> Container <tspan class="code-tag">synexis-postgres</tspan> terminated with Exit Code 137 (SIGKILL), halting the postmaster process on port 5432.</text>
+
+  <text x="300" y="415" class="chat-ai"><tspan font-weight="700">2. Observed Telemetry Facts:</tspan></text>
+  <text x="320" y="440" class="chat-ai">• Docker SDK reported process state: <tspan class="code-tag" fill="#be123c">exited</tspan></text>
+  <text x="320" y="465" class="chat-ai">• <tspan class="code-tag">synexis-demo-app</tspan> logged 14 consecutive connection refusal errors (<tspan font-family="JetBrains Mono" font-size="11">psycopg2.OperationalError</tspan>)</text>
+  <text x="320" y="490" class="chat-ai">• HTTP /health endpoint returned status 503 Service Unavailable</text>
+
+  <text x="300" y="530" class="chat-ai"><tspan font-weight="700">3. Remediation &amp; Recovery:</tspan> The operator approved action <tspan class="code-tag">restart_container</tspan> on <tspan class="code-tag">synexis-postgres</tspan>.</text>
+  <text x="300" y="555" class="chat-ai">All 4 post-recovery checks passed (Process state, Docker healthcheck, HTTP probe, error rate quiescence), resolving the incident.</text>
+
+  <!-- Citations Pill -->
+  <rect x="300" y="580" width="410" height="28" rx="6" fill="#eef2ff" stroke="#c7d2fe" />
+  <text x="315" y="598" font-family="Inter" font-size="11" font-weight="600" fill="#3730a3">Knowledge Source: RUNBOOK-DB-03 (Relevance: 91.2%)</text>
+
+  <!-- Input Bar (Bottom) -->
+  <rect x="265" y="645" width="890" height="50" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="285" y="675" font-family="Inter" font-size="12" fill="#94a3b8">Ask Synexis Copilot about infrastructure, active incidents, or playbooks...</text>
+  <rect x="1075" y="653" width="70" height="34" rx="6" fill="#4f46e5" />
+  <text x="1110" y="674" text-anchor="middle" font-family="Inter" font-size="11" font-weight="600" fill="#ffffff">Send</text>
+</svg>

@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="100%" height="100%">
+  <defs>
+    <style>
+      .app-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 16px; fill: #0f172a; }
+      .nav-item { font-family: 'Inter', -apple-system, sans-serif; font-weight: 500; font-size: 13px; fill: #64748b; }
+      .nav-active { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 13px; fill: #4f46e5; }
+      .view-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 18px; fill: #0f172a; }
+      .view-sub { font-family: 'Inter', -apple-system, sans-serif; font-size: 12px; fill: #64748b; }
+      .source-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 14px; fill: #0f172a; }
+      .source-desc { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #475569; }
+      .badge-conn { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 10px; fill: #15803d; }
+      .badge-disc { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 10px; fill: #64748b; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="750" fill="#f8fafc" />
+
+  <!-- Navbar -->
+  <rect width="1200" height="56" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <rect x="24" y="16" width="24" height="24" rx="6" fill="#4f46e5" />
+  <text x="36" y="33" text-anchor="middle" font-family="Inter" font-weight="800" font-size="14" fill="#ffffff">S</text>
+  <text x="56" y="33" class="app-title">Synexis</text>
+
+  <!-- Sidebar -->
+  <rect y="56" width="220" height="694" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <text x="28" y="92" class="nav-item">📊 Dashboard</text>
+  <text x="28" y="130" class="nav-item">📈 Host Telemetry</text>
+  <text x="28" y="165" class="nav-item">🐳 Containers</text>
+  <text x="28" y="200" class="nav-item">📜 Log Stream</text>
+  <text x="28" y="235" class="nav-item">🚨 Incidents (0)</text>
+  <text x="28" y="270" class="nav-item">🧠 AI Root Cause</text>
+  <text x="28" y="305" class="nav-item">⚡ Chaos Lab</text>
+  <text x="28" y="340" class="nav-item">🔧 Remediation &amp; Audit</text>
+  <text x="28" y="375" class="nav-item">🤖 DevOps Copilot</text>
+  <rect x="12" y="395" width="196" height="34" rx="6" fill="#eef2ff" />
+  <text x="28" y="417" class="nav-active">🔌 Data Sources</text>
+
+  <!-- Main Area -->
+  <text x="245" y="95" class="view-title">Connected Data Sources &amp; Integration Health</text>
+  <text x="245" y="115" class="view-sub">Live provenance verification matrix explaining exactly where telemetry, logs, and RAG knowledge originate</text>
+
+  <!-- Data Sources Grid -->
+  <!-- 1. Local Host -->
+  <rect x="245" y="145" width="295" height="155" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <rect x="245" y="145" width="295" height="35" rx="8" fill="#f8fafc" />
+  <line x1="245" y1="180" x2="540" y2="180" stroke="#e2e8f0" />
+  <text x="265" y="168" class="source-title">Local Host OS</text>
+  <rect x="440" y="152" width="85" height="20" rx="4" fill="#f0fdf4" stroke="#bbf7d0" /><text x="482" y="166" text-anchor="middle" class="badge-conn">CONNECTED</text>
+  <text x="265" y="205" class="source-desc">• Library: psutil (Python native)</text>
+  <text x="265" y="225" class="source-desc">• Data: CPU %, RAM, Disk, Net I/O</text>
+  <text x="265" y="245" class="source-desc">• Sampling Interval: 3 seconds</text>
+  <text x="265" y="265" class="source-desc">• Status: Live Stream Active</text>
+
+  <!-- 2. Docker Engine -->
+  <rect x="560" y="145" width="295" height="155" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <rect x="560" y="145" width="295" height="35" rx="8" fill="#f8fafc" />
+  <line x1="560" y1="180" x2="855" y2="180" stroke="#e2e8f0" />
+  <text x="580" y="168" class="source-title">Docker Engine Daemon</text>
+  <rect x="755" y="152" width="85" height="20" rx="4" fill="#f0fdf4" stroke="#bbf7d0" /><text x="797" y="166" text-anchor="middle" class="badge-conn">CONNECTED</text>
+  <text x="580" y="205" class="source-desc">• Driver: Docker Python SDK (unix/pipe)</text>
+  <text x="580" y="225" class="source-desc">• Boundary: synexis-* sandbox fleet</text>
+  <text x="580" y="245" class="source-desc">• Data: Lifecycle, Health, CPU/RAM</text>
+  <text x="580" y="265" class="source-desc">• Status: 3 Containers Active</text>
+
+  <!-- 3. PostgreSQL Database -->
+  <rect x="875" y="145" width="300" height="155" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <rect x="875" y="145" width="300" height="35" rx="8" fill="#f8fafc" />
+  <line x1="875" y1="180" x2="1175" y2="180" stroke="#e2e8f0" />
+  <text x="895" y="168" class="source-title">PostgreSQL Database</text>
+  <rect x="1075" y="152" width="85" height="20" rx="4" fill="#f0fdf4" stroke="#bbf7d0" /><text x="1117" y="166" text-anchor="middle" class="badge-conn">CONNECTED</text>
+  <text x="895" y="205" class="source-desc">• Driver: SQLAlchemy 2.0 / psycopg2</text>
+  <text x="895" y="225" class="source-desc">• Endpoint: synexis-postgres:5432</text>
+  <text x="895" y="245" class="source-desc">• Storage: Incidents, Audit, RAG Chunks</text>
+  <text x="895" y="265" class="source-desc">• Status: Healthy / SQLite dev fallback</text>
+
+  <!-- Row 2 -->
+  <!-- 4. Vector RAG Store -->
+  <rect x="245" y="320" width="295" height="155" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <rect x="245" y="320" width="295" height="35" rx="8" fill="#f8fafc" />
+  <line x1="245" y1="355" x2="540" y2="355" stroke="#e2e8f0" />
+  <text x="265" y="343" class="source-title">Vector RAG Knowledge Base</text>
+  <rect x="440" y="327" width="85" height="20" rx="4" fill="#f0fdf4" stroke="#bbf7d0" /><text x="482" y="341" text-anchor="middle" class="badge-conn">READY</text>
+  <text x="265" y="380" class="source-desc">• Embedding: 128-D Dense Embeddings</text>
+  <text x="265" y="400" class="source-desc">• Corpus: 11 SRE Runbooks &amp; Playbooks</text>
+  <text x="265" y="420" class="source-desc">• Ranker: 0.60 Cosine + 0.40 BM25</text>
+  <text x="265" y="440" class="source-desc">• Status: Dynamic Indexing Active</text>
+
+  <!-- 5. AI Reasoning Provider -->
+  <rect x="560" y="320" width="295" height="155" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <rect x="560" y="320" width="295" height="35" rx="8" fill="#f8fafc" />
+  <line x1="560" y1="355" x2="855" y2="355" stroke="#e2e8f0" />
+  <text x="580" y="343" class="source-title">AI Diagnostic Provider</text>
+  <rect x="755" y="327" width="85" height="20" rx="4" fill="#f0fdf4" stroke="#bbf7d0" /><text x="797" y="341" text-anchor="middle" class="badge-conn">READY</text>
+  <text x="580" y="380" class="source-desc">• Primary: Gemini 1.5 / OpenAI API</text>
+  <text x="580" y="400" class="source-desc">• Fallback: Deterministic SRE Rules</text>
+  <text x="580" y="420" class="source-desc">• Schema: Strict Structured JSON Output</text>
+  <text x="580" y="440" class="source-desc">• Safety: Zero arbitrary shell exec</text>
+
+  <!-- 6. Unconfigured Cloud Services (Honest State) -->
+  <rect x="875" y="320" width="300" height="155" rx="8" fill="#f8fafc" stroke="#e2e8f0" />
+  <rect x="875" y="320" width="300" height="35" rx="8" fill="#f1f5f9" />
+  <line x1="875" y1="355" x2="1175" y2="355" stroke="#e2e8f0" />
+  <text x="895" y="343" class="source-title" fill="#64748b">External Cloud / Kubernetes</text>
+  <rect x="1055" y="327" width="105" height="20" rx="4" fill="#f1f5f9" stroke="#cbd5e1" /><text x="1107" y="341" text-anchor="middle" class="badge-disc">NOT CONNECTED</text>
+  <text x="895" y="380" class="source-desc" fill="#94a3b8">• AWS CloudWatch / Azure Monitor</text>
+  <text x="895" y="400" class="source-desc" fill="#94a3b8">• Kubernetes Cluster API</text>
+  <text x="895" y="420" class="source-desc" fill="#94a3b8">• Status: Optional cloud connectors</text>
+  <text x="895" y="440" class="source-desc" fill="#94a3b8">• (Explicitly unconfigured in local demo)</text>
+</svg>

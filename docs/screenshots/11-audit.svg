@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="100%" height="100%">
+  <defs>
+    <style>
+      .app-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 16px; fill: #0f172a; }
+      .nav-item { font-family: 'Inter', -apple-system, sans-serif; font-weight: 500; font-size: 13px; fill: #64748b; }
+      .nav-active { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 13px; fill: #4f46e5; }
+      .view-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 18px; fill: #0f172a; }
+      .view-sub { font-family: 'Inter', -apple-system, sans-serif; font-size: 12px; fill: #64748b; }
+      .table-hdr { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 11px; fill: #64748b; }
+      .table-cell { font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #1e293b; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="750" fill="#f8fafc" />
+
+  <!-- Navbar -->
+  <rect width="1200" height="56" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <rect x="24" y="16" width="24" height="24" rx="6" fill="#4f46e5" />
+  <text x="36" y="33" text-anchor="middle" font-family="Inter" font-weight="800" font-size="14" fill="#ffffff">S</text>
+  <text x="56" y="33" class="app-title">Synexis</text>
+
+  <!-- Sidebar -->
+  <rect y="56" width="220" height="694" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <text x="28" y="92" class="nav-item">📊 Dashboard</text>
+  <text x="28" y="130" class="nav-item">📈 Host Telemetry</text>
+  <text x="28" y="165" class="nav-item">🐳 Containers</text>
+  <text x="28" y="200" class="nav-item">📜 Log Stream</text>
+  <text x="28" y="235" class="nav-item">🚨 Incidents (0)</text>
+  <text x="28" y="270" class="nav-item">🧠 AI Root Cause</text>
+  <text x="28" y="305" class="nav-item">⚡ Chaos Lab</text>
+  <rect x="12" y="325" width="196" height="34" rx="6" fill="#eef2ff" />
+  <text x="28" y="347" class="nav-active">🔧 Remediation &amp; Audit</text>
+  <text x="28" y="382" class="nav-item">🤖 DevOps Copilot</text>
+  <text x="28" y="417" class="nav-item">🔌 Data Sources</text>
+
+  <!-- Main Area -->
+  <text x="245" y="95" class="view-title">Compliance Audit Trail &amp; Verification Records</text>
+  <text x="245" y="115" class="view-sub">Immutable ledger of operator authorizations, remediation executions, and post-action health probe proofs</text>
+
+  <!-- Audit Table -->
+  <rect x="245" y="145" width="930" height="570" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <rect x="245" y="145" width="930" height="40" rx="8" fill="#f8fafc" />
+  <line x1="245" y1="185" x2="1175" y2="185" stroke="#e2e8f0" />
+
+  <text x="265" y="170" class="table-hdr">TIMESTAMP</text>
+  <text x="365" y="170" class="table-hdr">ACTOR</text>
+  <text x="470" y="170" class="table-hdr">ROLE</text>
+  <text x="560" y="170" class="table-hdr">ACTION TYPE</text>
+  <text x="700" y="170" class="table-hdr">TARGET CONTAINER</text>
+  <text x="860" y="170" class="table-hdr">INCIDENT ID</text>
+  <text x="970" y="170" class="table-hdr">EXECUTION</text>
+  <text x="1070" y="170" class="table-hdr">VERIFICATION</text>
+
+  <!-- Row 1: Execute restart -->
+  <text x="265" y="225" class="table-cell" fill="#64748b">21:32:11.412</text>
+  <text x="365" y="225" class="table-cell" font-weight="700">sre_operator</text>
+  <text x="470" y="225" class="table-cell">admin</text>
+  <text x="560" y="225" class="table-cell" font-weight="600" fill="#4338ca">remediation.execute</text>
+  <text x="700" y="225" class="table-cell">synexis-postgres</text>
+  <text x="860" y="225" class="table-cell" font-weight="700">INC-00042</text>
+  <rect x="965" y="210" width="70" height="22" rx="4" fill="#f0fdf4" stroke="#bbf7d0" />
+  <text x="1000" y="225" text-anchor="middle" class="table-cell" fill="#15803d" font-size="10" font-weight="700">SUCCESS</text>
+  <text x="1070" y="225" class="table-cell" fill="#15803d" font-weight="700">4/4 PASSED</text>
+  <line x1="245" y1="250" x2="1175" y2="250" stroke="#f1f5f9" />
+
+  <!-- Row 2: Approve action -->
+  <text x="265" y="285" class="table-cell" fill="#64748b">21:32:10.890</text>
+  <text x="365" y="285" class="table-cell" font-weight="700">sre_operator</text>
+  <text x="470" y="285" class="table-cell">admin</text>
+  <text x="560" y="285" class="table-cell" font-weight="600" fill="#4338ca">remediation.approve</text>
+  <text x="700" y="285" class="table-cell">synexis-postgres</text>
+  <text x="860" y="285" class="table-cell" font-weight="700">INC-00042</text>
+  <rect x="965" y="270" width="70" height="22" rx="4" fill="#f0fdf4" stroke="#bbf7d0" />
+  <text x="1000" y="285" text-anchor="middle" class="table-cell" fill="#15803d" font-size="10" font-weight="700">APPROVED</text>
+  <text x="1070" y="285" class="table-cell" fill="#64748b">N/A</text>
+  <line x1="245" y1="310" x2="1175" y2="310" stroke="#f1f5f9" />
+
+  <!-- Row 3: Reject test -->
+  <text x="265" y="345" class="table-cell" fill="#64748b">21:32:02.104</text>
+  <text x="365" y="345" class="table-cell" font-weight="700">sre_operator</text>
+  <text x="470" y="345" class="table-cell">admin</text>
+  <text x="560" y="345" class="table-cell" font-weight="600" fill="#b45309">remediation.reject</text>
+  <text x="700" y="345" class="table-cell">synexis-postgres</text>
+  <text x="860" y="345" class="table-cell" font-weight="700">INC-00042</text>
+  <rect x="965" y="330" width="70" height="22" rx="4" fill="#fff1f2" stroke="#fecdd3" />
+  <text x="1000" y="345" text-anchor="middle" class="table-cell" fill="#be123c" font-size="10" font-weight="700">REJECTED</text>
+  <text x="1070" y="345" class="table-cell" fill="#64748b">BLOCKED</text>
+  <line x1="245" y1="370" x2="1175" y2="370" stroke="#f1f5f9" />
+
+  <!-- Row 4: Propose action -->
+  <text x="265" y="405" class="table-cell" fill="#64748b">21:31:51.218</text>
+  <text x="365" y="405" class="table-cell" font-weight="700">ai_rca_engine</text>
+  <text x="470" y="405" class="table-cell">system</text>
+  <text x="560" y="405" class="table-cell" font-weight="600" fill="#4338ca">remediation.propose</text>
+  <text x="700" y="405" class="table-cell">synexis-postgres</text>
+  <text x="860" y="405" class="table-cell" font-weight="700">INC-00042</text>
+  <rect x="965" y="390" width="70" height="22" rx="4" fill="#fef9c3" stroke="#fde047" />
+  <text x="1000" y="405" text-anchor="middle" class="table-cell" fill="#854d0e" font-size="10" font-weight="700">PROPOSED</text>
+  <text x="1070" y="405" class="table-cell" fill="#64748b">PENDING</text>
+</svg>

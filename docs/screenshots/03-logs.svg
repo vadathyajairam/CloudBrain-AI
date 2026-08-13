@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="100%" height="100%">
+  <defs>
+    <style>
+      .app-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 16px; fill: #0f172a; }
+      .nav-item { font-family: 'Inter', -apple-system, sans-serif; font-weight: 500; font-size: 13px; fill: #64748b; }
+      .nav-active { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 13px; fill: #4f46e5; }
+      .view-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 18px; fill: #0f172a; }
+      .view-sub { font-family: 'Inter', -apple-system, sans-serif; font-size: 12px; fill: #64748b; }
+      .log-ts { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #64748b; }
+      .log-svc { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #4338ca; font-weight: 600; }
+      .log-msg { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #1e293b; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="750" fill="#f8fafc" />
+
+  <!-- Navbar -->
+  <rect width="1200" height="56" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <rect x="24" y="16" width="24" height="24" rx="6" fill="#4f46e5" />
+  <text x="36" y="33" text-anchor="middle" font-family="Inter" font-weight="800" font-size="14" fill="#ffffff">S</text>
+  <text x="56" y="33" class="app-title">Synexis</text>
+
+  <!-- Sidebar -->
+  <rect y="56" width="220" height="694" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <text x="28" y="92" class="nav-item">📊 Dashboard</text>
+  <text x="28" y="130" class="nav-item">📈 Host Telemetry</text>
+  <text x="28" y="165" class="nav-item">🐳 Containers</text>
+  <rect x="12" y="180" width="196" height="34" rx="6" fill="#eef2ff" />
+  <text x="28" y="202" class="nav-active">📜 Log Stream</text>
+  <text x="28" y="237" class="nav-item">🚨 Incidents (0)</text>
+  <text x="28" y="272" class="nav-item">🧠 AI Root Cause</text>
+  <text x="28" y="307" class="nav-item">⚡ Chaos Lab</text>
+  <text x="28" y="342" class="nav-item">🔧 Remediation &amp; Audit</text>
+  <text x="28" y="377" class="nav-item">🤖 DevOps Copilot</text>
+  <text x="28" y="412" class="nav-item">🔌 Data Sources</text>
+
+  <!-- Main Area -->
+  <text x="245" y="95" class="view-title">Intelligent Microservice Log Explorer</text>
+  <text x="245" y="115" class="view-sub">Real-time streaming log ingestion across Docker sandbox containers with automated error clustering</text>
+
+  <!-- Filter Bar -->
+  <rect x="245" y="135" width="930" height="45" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="265" y="162" font-family="Inter" font-size="12" fill="#64748b">Filter Service: [ All Containers ]</text>
+  <text x="480" y="162" font-family="Inter" font-size="12" fill="#64748b">Level: [ ALL LEVELS ]</text>
+  <text x="660" y="162" font-family="Inter" font-size="12" fill="#64748b">Search: "connection refused"</text>
+  <rect x="1060" y="143" width="100" height="28" rx="6" fill="#4f46e5" />
+  <text x="1110" y="161" text-anchor="middle" font-family="Inter" font-size="11" font-weight="600" fill="#ffffff">AI Analyze</text>
+
+  <!-- Log Terminal Window -->
+  <rect x="245" y="195" width="930" height="520" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <rect x="245" y="195" width="930" height="35" rx="8" fill="#f8fafc" />
+  <line x1="245" y1="230" x2="1175" y2="230" stroke="#e2e8f0" />
+  <text x="265" y="217" font-family="JetBrains Mono" font-size="11" font-weight="600" fill="#64748b">STREAM: synexis-sandbox-cluster (Active Auto-Refresh)</text>
+
+  <!-- Log Rows -->
+  <!-- 1 -->
+  <text x="265" y="260" class="log-ts">21:30:02.114</text>
+  <text x="365" y="260" class="log-svc">[synexis-postgres]</text>
+  <rect x="495" y="247" width="45" height="18" rx="3" fill="#f0fdf4" /><text x="517" y="260" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#15803d">INFO</text>
+  <text x="555" y="260" class="log-msg">PostgreSQL 15 database system is ready to accept client connections</text>
+
+  <!-- 2 -->
+  <text x="265" y="295" class="log-ts">21:30:04.281</text>
+  <text x="365" y="295" class="log-svc">[synexis-redis]</text>
+  <rect x="495" y="282" width="45" height="18" rx="3" fill="#f0fdf4" /><text x="517" y="295" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#15803d">INFO</text>
+  <text x="555" y="295" class="log-msg">Ready to accept connections tcp:6379, maxmemory 128mb initialized</text>
+
+  <!-- 3 -->
+  <text x="265" y="330" class="log-ts">21:30:05.419</text>
+  <text x="365" y="330" class="log-svc">[synexis-demo-app]</text>
+  <rect x="495" y="317" width="45" height="18" rx="3" fill="#f0fdf4" /><text x="517" y="330" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#15803d">INFO</text>
+  <text x="555" y="330" class="log-msg">Application gateway listening on port 5000 (connected to db &amp; redis)</text>
+
+  <!-- 4: Failure event -->
+  <text x="265" y="365" class="log-ts">21:31:42.008</text>
+  <text x="365" y="365" class="log-svc">[synexis-demo-app]</text>
+  <rect x="495" y="352" width="45" height="18" rx="3" fill="#fff1f2" /><text x="517" y="365" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#be123c">ERROR</text>
+  <text x="555" y="365" class="log-msg" fill="#be123c">psycopg2.OperationalError: could not connect to server: Connection refused</text>
+
+  <!-- 5 -->
+  <text x="265" y="400" class="log-ts">21:31:42.012</text>
+  <text x="365" y="400" class="log-svc">[synexis-demo-app]</text>
+  <rect x="495" y="387" width="45" height="18" rx="3" fill="#fff1f2" /><text x="517" y="400" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#be123c">ERROR</text>
+  <text x="555" y="400" class="log-msg" fill="#be123c">Is the server running on host "synexis-postgres" (172.20.0.3) port 5432?</text>
+
+  <!-- 6 -->
+  <text x="265" y="435" class="log-ts">21:31:45.102</text>
+  <text x="365" y="435" class="log-svc">[synexis-demo-app]</text>
+  <rect x="495" y="422" width="45" height="18" rx="3" fill="#fffbeb" /><text x="517" y="435" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#b45309">WARN</text>
+  <text x="555" y="435" class="log-msg">Database pool exhausted; circuit breaker triggered fallback response</text>
+</svg>

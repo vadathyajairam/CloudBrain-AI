@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="100%" height="100%">
+  <defs>
+    <style>
+      .modal-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 16px; fill: #0f172a; }
+      .section-hdr { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 12px; fill: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+      .data-key { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #64748b; }
+      .data-val { font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #0f172a; font-weight: 600; }
+      .log-trace { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #be123c; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="750" fill="#0f172a" fill-opacity="0.6" />
+
+  <!-- Modal Box -->
+  <rect x="150" y="40" width="900" height="670" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+
+  <!-- Modal Header -->
+  <rect x="150" y="40" width="900" height="65" rx="12" fill="#f8fafc" />
+  <line x1="150" y1="105" x2="1050" y2="105" stroke="#e2e8f0" />
+  <rect x="180" y="58" width="85" height="24" rx="4" fill="#fff1f2" stroke="#fecdd3" />
+  <text x="222" y="74" text-anchor="middle" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#be123c">INC-00042</text>
+  <text x="280" y="76" class="modal-title">Incident Evidence &amp; Telemetry Bundle: synexis-postgres</text>
+  <rect x="940" y="58" width="85" height="24" rx="4" fill="#f1f5f9" /><text x="982" y="74" text-anchor="middle" font-family="Inter" font-size="11" font-weight="600" fill="#64748b">Close [ESC]</text>
+
+  <!-- Evidence Tabs -->
+  <rect x="180" y="120" width="840" height="35" rx="6" fill="#f1f5f9" />
+  <rect x="182" y="122" width="160" height="31" rx="5" fill="#ffffff" />
+  <text x="262" y="142" text-anchor="middle" font-family="Inter" font-size="12" font-weight="700" fill="#4f46e5">1. Evidence Bundle</text>
+  <text x="430" y="142" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#64748b">2. RAG Runbooks</text>
+  <text x="590" y="142" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#64748b">3. AI RCA Diagnosis</text>
+  <text x="760" y="142" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#64748b">4. Remediation &amp; 4-Point Check</text>
+
+  <!-- Evidence Grid -->
+  <!-- Container State Snapshot -->
+  <rect x="180" y="175" width="405" height="150" rx="8" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="200" y="200" class="section-hdr">Docker Container State Evidence</text>
+  <text x="200" y="230" class="data-key">Target Container:</text><text x="350" y="230" class="data-val">synexis-postgres</text>
+  <text x="200" y="255" class="data-key">Process Status:</text><text x="350" y="255" class="data-val" fill="#be123c">exited (Exit Code 137)</text>
+  <text x="200" y="280" class="data-key">Healthcheck Status:</text><text x="350" y="280" class="data-val" fill="#be123c">unhealthy (timeout)</text>
+  <text x="200" y="305" class="data-key">Restart Count:</text><text x="350" y="305" class="data-val">1</text>
+
+  <!-- Host & Compute Metrics -->
+  <rect x="615" y="175" width="405" height="150" rx="8" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="635" y="200" class="section-hdr">Host &amp; Resource Metrics at Failure</text>
+  <text x="635" y="230" class="data-key">Host CPU Utilization:</text><text x="810" y="230" class="data-val">22.4% (Normal)</text>
+  <text x="635" y="255" class="data-key">Container CPU Usage:</text><text x="810" y="255" class="data-val" fill="#be123c">0.0% (Stopped)</text>
+  <text x="635" y="280" class="data-key">Container Memory Usage:</text><text x="810" y="280" class="data-val">0.0 MB / 512 MB</text>
+  <text x="635" y="305" class="data-key">Database Probe Latency:</text><text x="810" y="305" class="data-val" fill="#be123c">Socket Timeout (5000ms)</text>
+
+  <!-- Error Log Trace Evidence (Bottom) -->
+  <rect x="180" y="345" width="840" height="235" rx="8" fill="#fff1f2" stroke="#fecdd3" />
+  <text x="200" y="375" class="section-hdr" fill="#be123c">Cascading Application Error Logs (synexis-demo-app)</text>
+
+  <rect x="200" y="390" width="800" height="170" rx="6" fill="#ffffff" stroke="#fecdd3" />
+  <text x="215" y="415" class="log-trace">[21:31:42.008] [synexis-demo-app] ERROR: psycopg2.OperationalError: could not connect to server: Connection refused</text>
+  <text x="215" y="440" class="log-trace">               Is the server running on host "synexis-postgres" (172.20.0.3) and accepting TCP/IP connections on port 5432?</text>
+  <text x="215" y="475" class="log-trace">[21:31:42.012] [synexis-demo-app] ERROR: Database connection pool checkout failed after 3 attempts</text>
+  <text x="215" y="500" class="log-trace">[21:31:45.102] [synexis-demo-app] WARN: Circuit breaker OPEN for route /api/v1/orders; fallback response returned to client</text>
+  <text x="215" y="535" class="log-trace">[21:31:45.310] [synexis-demo-app] CRITICAL: HTTP GET /health probe returned status 503 Service Unavailable (DB offline)</text>
+
+  <!-- Footer Actions -->
+  <rect x="180" y="600" width="840" height="45" rx="8" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="200" y="628" font-family="Inter" font-size="12" fill="#64748b">Telemetry bundle compiled in 180ms • Verified provenance: Docker SDK + psutil</text>
+  <rect x="860" y="608" width="145" height="30" rx="6" fill="#4f46e5" />
+  <text x="932" y="627" text-anchor="middle" font-family="Inter" font-size="11" font-weight="600" fill="#ffffff">Proceed to RAG →</text>
+</svg>

@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="100%" height="100%">
+  <defs>
+    <style>
+      .app-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 16px; fill: #0f172a; }
+      .nav-item { font-family: 'Inter', -apple-system, sans-serif; font-weight: 500; font-size: 13px; fill: #64748b; }
+      .nav-active { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 13px; fill: #4f46e5; }
+      .view-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 18px; fill: #0f172a; }
+      .view-sub { font-family: 'Inter', -apple-system, sans-serif; font-size: 12px; fill: #64748b; }
+      .btn { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 12px; }
+      .data-val { font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #0f172a; font-weight: 600; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="750" fill="#f8fafc" />
+
+  <!-- Navbar -->
+  <rect width="1200" height="56" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <rect x="24" y="16" width="24" height="24" rx="6" fill="#4f46e5" />
+  <text x="36" y="33" text-anchor="middle" font-family="Inter" font-weight="800" font-size="14" fill="#ffffff">S</text>
+  <text x="56" y="33" class="app-title">Synexis</text>
+
+  <!-- Sidebar -->
+  <rect y="56" width="220" height="694" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+  <text x="28" y="92" class="nav-item">📊 Dashboard</text>
+  <text x="28" y="130" class="nav-item">📈 Host Telemetry</text>
+  <text x="28" y="165" class="nav-item">🐳 Containers</text>
+  <text x="28" y="200" class="nav-item">📜 Log Stream</text>
+  <text x="28" y="235" class="nav-item">🚨 Incidents (1)</text>
+  <text x="28" y="270" class="nav-item">🧠 AI Root Cause</text>
+  <text x="28" y="305" class="nav-item">⚡ Chaos Lab</text>
+  <rect x="12" y="325" width="196" height="34" rx="6" fill="#eef2ff" />
+  <text x="28" y="347" class="nav-active">🔧 Remediation &amp; Audit (1)</text>
+  <text x="28" y="382" class="nav-item">🤖 DevOps Copilot</text>
+  <text x="28" y="417" class="nav-item">🔌 Data Sources</text>
+
+  <!-- Main Area -->
+  <text x="245" y="95" class="view-title">Human-in-the-Loop Safe Remediation &amp; Audit Console</text>
+  <text x="245" y="115" class="view-sub">Strict authorization, safety allowlist gating, real Docker executions, post-remediation health checks, and verified audit trails</text>
+
+  <!-- Protocol Banner with Operator Config -->
+  <rect x="245" y="140" width="930" height="65" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <circle cx="270" cy="172" r="5" fill="#10b981" />
+  <text x="285" y="168" font-family="Inter" font-size="12" font-weight="700" fill="#0f172a">Synexis Authorization &amp; Safety Protocol Active</text>
+  <text x="285" y="186" font-family="Inter" font-size="11" fill="#64748b">LLMs cannot execute raw arbitrary shell commands. All suggested fixes require authenticated operator review &amp; container allowlist verification (synexis-*).</text>
+
+  <rect x="910" y="152" width="245" height="40" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+  <text x="925" y="176" font-family="Inter" font-size="11" fill="#64748b">Operator: <tspan font-weight="700" fill="#0f172a">sre_operator</tspan> (<tspan font-weight="700" fill="#4338ca">admin</tspan>)</text>
+
+  <!-- Pending Approvals Section -->
+  <text x="245" y="235" font-family="Inter" font-size="13" font-weight="700" fill="#0f172a">PENDING OPERATOR APPROVALS (1)</text>
+
+  <!-- Action Card Awaiting Review -->
+  <rect x="245" y="250" width="930" height="150" rx="10" fill="#ffffff" stroke="#fde047" stroke-width="2" />
+  <rect x="245" y="250" width="8" height="150" rx="4" fill="#eab308" />
+
+  <rect x="270" y="270" width="115" height="22" rx="4" fill="#fef9c3" stroke="#fde047" />
+  <text x="327" y="285" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#854d0e">PENDING REVIEW</text>
+
+  <text x="400" y="286" class="data-val">restart_container</text>
+  <text x="540" y="286" font-family="Inter" font-size="12" fill="#64748b">on</text>
+  <rect x="565" y="270" width="135" height="22" rx="4" fill="#eef2ff" stroke="#c7d2fe" />
+  <text x="632" y="285" text-anchor="middle" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#3730a3">synexis-postgres</text>
+
+  <text x="270" y="325" font-family="Inter" font-size="13" font-weight="600" fill="#1e293b">Reason: Database container is stopped and application connection attempts are failing (INC-00042).</text>
+  <text x="270" y="348" font-family="Inter" font-size="11" fill="#64748b">Proposed by: <tspan font-family="JetBrains Mono">ai_rca_engine</tspan> • Action ID: <tspan font-family="JetBrains Mono">act_f8103a</tspan> • Risk Level: <tspan font-weight="600" fill="#15803d">Low</tspan> • Target Allowlist: <tspan font-weight="600" fill="#15803d">VERIFIED</tspan></text>
+
+  <!-- Approval and Rejection Buttons -->
+  <rect x="880" y="340" width="110" height="38" rx="6" fill="#f1f5f9" stroke="#cbd5e1" />
+  <text x="935" y="364" text-anchor="middle" class="btn" fill="#475569">Reject</text>
+
+  <rect x="1005" y="340" width="150" height="38" rx="6" fill="#16a34a" />
+  <text x="1080" y="364" text-anchor="middle" class="btn" fill="#ffffff">Approve &amp; Execute Fix</text>
+
+  <!-- Executed History (Bottom) -->
+  <text x="245" y="435" font-family="Inter" font-size="13" font-weight="700" fill="#0f172a">RECENT REMEDIATION ACTIONS &amp; AUDIT TRAIL</text>
+
+  <rect x="245" y="450" width="930" height="260" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+  <rect x="245" y="450" width="930" height="35" rx="8" fill="#f8fafc" />
+  <line x1="245" y1="485" x2="1175" y2="485" stroke="#e2e8f0" />
+  <text x="265" y="472" font-family="Inter" font-size="11" font-weight="600" fill="#64748b">TIMESTAMP</text>
+  <text x="390" y="472" font-family="Inter" font-size="11" font-weight="600" fill="#64748b">OPERATOR</text>
+  <text x="500" y="472" font-family="Inter" font-size="11" font-weight="600" fill="#64748b">ACTION</text>
+  <text x="640" y="472" font-family="Inter" font-size="11" font-weight="600" fill="#64748b">TARGET</text>
+  <text x="790" y="472" font-family="Inter" font-size="11" font-weight="600" fill="#64748b">APPROVAL</text>
+  <text x="910" y="472" font-family="Inter" font-size="11" font-weight="600" fill="#64748b">RESULT</text>
+  <text x="1040" y="472" font-family="Inter" font-size="11" font-weight="600" fill="#64748b">VERIFICATION</text>
+
+  <!-- Row -->
+  <text x="265" y="520" font-family="JetBrains Mono" font-size="11" fill="#64748b">21:20:14</text>
+  <text x="390" y="520" font-family="JetBrains Mono" font-size="11" fill="#0f172a">sre_operator</text>
+  <text x="500" y="520" font-family="JetBrains Mono" font-size="11" fill="#4338ca">restart_container</text>
+  <text x="640" y="520" font-family="JetBrains Mono" font-size="11">synexis-demo-app</text>
+  <text x="790" y="520" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#15803d">APPROVED</text>
+  <text x="910" y="520" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#15803d">SUCCESS</text>
+  <text x="1040" y="520" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#15803d">4/4 PASSED</text>
+</svg>
