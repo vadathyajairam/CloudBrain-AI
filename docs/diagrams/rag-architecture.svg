@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 850" width="100%" height="100%">
+  <defs>
+    <style>
+      .title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 18px; fill: #0f172a; }
+      .subtitle { font-family: 'Inter', -apple-system, sans-serif; font-weight: 400; font-size: 12px; fill: #64748b; }
+      .box-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 13px; fill: #1e293b; }
+      .box-desc { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #475569; }
+      .math-text { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #4338ca; font-weight: 600; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="950" height="850" fill="#ffffff" />
+  <rect x="20" y="20" width="910" height="810" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+
+  <!-- Header -->
+  <text x="475" y="55" text-anchor="middle" class="title">Synexis — Dense Vector RAG &amp; Hybrid Retrieval Architecture</text>
+  <text x="475" y="75" text-anchor="middle" class="subtitle">128-D Dense Embeddings • Sublinear TF-IDF • BM25 Hybrid Ranking • Dynamic Incident Learning</text>
+
+  <!-- Knowledge Corpus (Top Left) -->
+  <rect x="60" y="110" width="260" height="110" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="190" y="135" text-anchor="middle" class="box-title">Static Knowledge Corpus</text>
+  <text x="80" y="160" class="box-desc">• 11 SRE Troubleshooting Runbooks</text>
+  <text x="80" y="180" class="box-desc">• Container Architecture Guides</text>
+  <text x="80" y="200" class="box-desc">• PostgreSQL &amp; Redis Playbooks</text>
+
+  <!-- Dynamic Post-Mortems (Top Right) -->
+  <rect x="630" y="110" width="260" height="110" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" />
+  <text x="760" y="135" text-anchor="middle" class="box-title" fill="#166534">Dynamic Incident Lessons</text>
+  <text x="650" y="160" class="box-desc" fill="#15803d">• Resolved Incident Post-Mortems</text>
+  <text x="650" y="180" class="box-desc" fill="#15803d">• Verified Remediation Actions</text>
+  <text x="650" y="200" class="box-desc" fill="#15803d">• Auto-Indexed on Resolution</text>
+
+  <!-- Ingestion Pipeline (Middle) -->
+  <rect x="345" y="110" width="260" height="110" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="475" y="135" text-anchor="middle" class="box-title">Document Processing</text>
+  <text x="365" y="160" class="box-desc">• Recursive Text Chunking</text>
+  <text x="365" y="180" class="box-desc">• Window: 250 Tokens (40 overlap)</text>
+  <text x="365" y="200" class="box-desc">• Section Header Extraction</text>
+
+  <!-- Arrows into Ingestion -->
+  <line x1="320" y1="165" x2="345" y2="165" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+  <line x1="630" y1="165" x2="605" y2="165" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- Vectorization Box -->
+  <rect x="225" y="260" width="500" height="110" rx="8" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5" />
+  <text x="475" y="285" text-anchor="middle" class="box-title" fill="#3730a3">128-Dimensional Dense Vector Embedding Model</text>
+  <text x="245" y="310" class="math-text">Sublinear TF: tf_weight = 1.0 + ln(1.0 + term_frequency)</text>
+  <text x="245" y="330" class="math-text">Subwords: Character 3-4 grams + Word-level token hashing</text>
+  <text x="245" y="350" class="math-text">L2 Normalization: ||v||₂ = 1.0 (Unit-sphere projection)</text>
+
+  <!-- Line from Ingestion to Vectorization -->
+  <line x1="475" y1="220" x2="475" y2="260" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- Vector Store -->
+  <rect x="325" y="410" width="300" height="65" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="475" y="435" text-anchor="middle" class="box-title">Synexis Local Vector Store</text>
+  <text x="475" y="455" text-anchor="middle" class="box-desc">Persisted in Table: rag_chunks / rag_documents</text>
+
+  <!-- Line to Vector Store -->
+  <line x1="475" y1="370" x2="475" y2="410" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- Retrieval & Hybrid Ranking -->
+  <rect x="200" y="515" width="550" height="105" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="475" y="540" text-anchor="middle" class="box-title">Hybrid Retrieval &amp; Ranking Engine</text>
+  <text x="220" y="565" class="math-text">Hybrid Score = 0.60 × CosineSim(q, d) + 0.40 × BM25(q, d) + HeaderBoost</text>
+  <text x="220" y="585" class="box-desc">• Cosine Similarity: Exact dot product between unit vectors (q · d)</text>
+  <text x="220" y="605" class="box-desc">• BM25 Scoring: Exact keyword term saturation &amp; document length penalty</text>
+
+  <!-- Line to Retrieval -->
+  <line x1="475" y1="475" x2="475" y2="515" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- Consumers (Bottom) -->
+  <rect x="150" y="660" width="300" height="90" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="300" y="685" text-anchor="middle" class="box-title">AI Root Cause Analysis (RCA)</text>
+  <text x="300" y="708" text-anchor="middle" class="box-desc">Injects top runbooks into LLM context</text>
+  <text x="300" y="728" text-anchor="middle" class="box-desc">Grounds diagnostic reasoning</text>
+
+  <rect x="500" y="660" width="300" height="90" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="650" y="685" text-anchor="middle" class="box-title">Grounded DevOps Copilot</text>
+  <text x="650" y="708" text-anchor="middle" class="box-desc">Answers operator questions using</text>
+  <text x="650" y="728" text-anchor="middle" class="box-desc">retrieved architecture runbooks</text>
+
+  <!-- Lines from Ranking to Consumers -->
+  <path d="M 400 620 L 400 640 L 300 640 L 300 660" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+  <path d="M 550 620 L 550 640 L 650 640 L 650 660" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+</svg>

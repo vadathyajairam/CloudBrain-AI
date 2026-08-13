@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 800" width="100%" height="100%">
+  <defs>
+    <style>
+      .title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 18px; fill: #0f172a; }
+      .subtitle { font-family: 'Inter', -apple-system, sans-serif; font-weight: 400; font-size: 12px; fill: #64748b; }
+      .node-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 13px; fill: #1e293b; }
+      .node-desc { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #475569; }
+      .data-flow-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: #4f46e5; font-weight: 600; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="800" fill="#ffffff" />
+  <rect x="20" y="20" width="860" height="760" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+
+  <!-- Header -->
+  <text x="450" y="55" text-anchor="middle" class="title">Synexis — End-to-End System Data Flow</text>
+  <text x="450" y="75" text-anchor="middle" class="subtitle">Complete Pipeline from Raw Telemetry Ingestion to Database Persistence &amp; RAG Indexing</text>
+
+  <!-- Layer 1: Ingestion Sources -->
+  <rect x="80" y="110" width="220" height="70" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="190" y="135" text-anchor="middle" class="node-title">Host &amp; Container Fleet</text>
+  <text x="190" y="155" text-anchor="middle" class="node-desc">psutil + Docker Engine</text>
+
+  <!-- Line 1 -> 2 -->
+  <line x1="300" y1="145" x2="360" y2="145" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+  <text x="330" y="135" text-anchor="middle" class="data-flow-label">Metrics/Logs</text>
+
+  <!-- Layer 2: Telemetry Pipeline -->
+  <rect x="360" y="110" width="220" height="70" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="470" y="135" text-anchor="middle" class="node-title">Telemetry Pipeline</text>
+  <text x="470" y="155" text-anchor="middle" class="node-desc">Buffering &amp; Standardization</text>
+
+  <!-- Line 2 -> 3 -->
+  <line x1="580" y1="145" x2="640" y2="145" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+  <text x="610" y="135" text-anchor="middle" class="data-flow-label">3s Snapshots</text>
+
+  <!-- Layer 3: Detection Engine -->
+  <rect x="640" y="110" width="220" height="70" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="750" y="135" text-anchor="middle" class="node-title">Detection Engine</text>
+  <text x="750" y="155" text-anchor="middle" class="node-desc">8 Continuous Rule Checks</text>
+
+  <!-- Line 3 down to Incident Manager -->
+  <path d="M 750 180 L 750 240 L 750 260" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+  <text x="755" y="225" class="data-flow-label">Anomaly Trigger</text>
+
+  <!-- Layer 4: Incident Manager & DB -->
+  <rect x="640" y="260" width="220" height="85" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="750" y="285" text-anchor="middle" class="node-title">Incident Manager</text>
+  <text x="750" y="305" text-anchor="middle" class="node-desc">State: DETECTED</text>
+  <text x="750" y="325" text-anchor="middle" class="node-desc">Table: incidents</text>
+
+  <!-- Line 4 left to Evidence Aggregator -->
+  <line x1="640" y1="302" x2="580" y2="302" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+  <text x="610" y="292" text-anchor="middle" class="data-flow-label">Incident ID</text>
+
+  <!-- Layer 5: Evidence Aggregator -->
+  <rect x="360" y="260" width="220" height="85" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="470" y="285" text-anchor="middle" class="node-title">Evidence Collector</text>
+  <text x="470" y="305" text-anchor="middle" class="node-desc">CPU/RAM/Exit/Logs/DB</text>
+  <text x="470" y="325" text-anchor="middle" class="node-desc">Table: incident_evidence</text>
+
+  <!-- Line 5 left to Vector RAG -->
+  <line x1="360" y1="302" x2="300" y2="302" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+  <text x="330" y="292" text-anchor="middle" class="data-flow-label">Evidence Text</text>
+
+  <!-- Layer 6: Vector RAG & AI RCA -->
+  <rect x="80" y="260" width="220" height="85" rx="8" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5" />
+  <text x="190" y="285" text-anchor="middle" class="node-title" fill="#3730a3">Vector RAG + AI RCA</text>
+  <text x="190" y="305" text-anchor="middle" class="node-desc" fill="#4338ca">128-D Cosine/BM25 Ranking</text>
+  <text x="190" y="325" text-anchor="middle" class="node-desc" fill="#4338ca">Table: ai_analyses</text>
+
+  <!-- Line 6 down to Safety & Approval -->
+  <path d="M 190 345 L 190 410 L 190 430" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+  <text x="195" y="395" class="data-flow-label">Structured Proposal</text>
+
+  <!-- Layer 7: Human-in-the-loop Approval -->
+  <rect x="80" y="430" width="220" height="85" rx="8" fill="#fef3c7" stroke="#fde047" stroke-width="1.5" />
+  <text x="190" y="455" text-anchor="middle" class="node-title" fill="#854d0e">Operator Approval Gate</text>
+  <text x="190" y="475" text-anchor="middle" class="node-desc" fill="#a16207">Role: sre_operator</text>
+  <text x="190" y="495" text-anchor="middle" class="node-desc" fill="#a16207">Table: remediation_actions</text>
+
+  <!-- Line 7 right to Remediation Execution -->
+  <line x1="300" y1="472" x2="360" y2="472" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+  <text x="330" y="462" text-anchor="middle" class="data-flow-label">Approved Action</text>
+
+  <!-- Layer 8: Docker SDK Remediation -->
+  <rect x="360" y="430" width="220" height="85" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="470" y="455" text-anchor="middle" class="node-title">Docker Remediation</text>
+  <text x="470" y="475" text-anchor="middle" class="node-desc">container.restart()</text>
+  <text x="470" y="495" text-anchor="middle" class="node-desc">Target: synexis-postgres</text>
+
+  <!-- Line 8 right to 4-Point Verification -->
+  <line x1="580" y1="472" x2="640" y2="472" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+  <text x="610" y="462" text-anchor="middle" class="data-flow-label">Recovering State</text>
+
+  <!-- Layer 9: 4-Point Verification -->
+  <rect x="640" y="430" width="220" height="85" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" />
+  <text x="750" y="455" text-anchor="middle" class="node-title" fill="#166534">4-Point Health Check</text>
+  <text x="750" y="475" text-anchor="middle" class="node-desc" fill="#15803d">Process • Health • Probe • Logs</text>
+  <text x="750" y="495" text-anchor="middle" class="node-desc" fill="#15803d">Result: PASSED</text>
+
+  <!-- Final Resolution & RAG Dynamic Loop (Bottom Box) -->
+  <rect x="80" y="580" width="780" height="150" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+  <text x="470" y="610" text-anchor="middle" class="node-title">Incident Resolution &amp; Dynamic RAG Vector Indexing</text>
+  <text x="105" y="640" class="node-desc">1. Incident status in database updated: DETECTED → INVESTIGATING → REMEDIATING → RESOLVED.</text>
+  <text x="105" y="665" class="node-desc">2. Complete post-mortem recorded in audit_logs (operator identity, actions taken, verification probes).</text>
+  <text x="105" y="690" class="node-desc">3. IncidentLesson vectorized via 128-D embedding model and stored in rag_chunks for future similarity matching.</text>
+
+  <line x1="750" y1="515" x2="750" y2="580" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arrow)" />
+</svg>

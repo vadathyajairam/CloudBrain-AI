@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 750" width="100%" height="100%">
+  <defs>
+    <style>
+      .title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 18px; fill: #0f172a; }
+      .subtitle { font-family: 'Inter', -apple-system, sans-serif; font-weight: 400; font-size: 12px; fill: #64748b; }
+      .box-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 13px; fill: #1e293b; }
+      .box-desc { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #475569; }
+      .schema-field { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #3730a3; font-weight: 600; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="750" fill="#ffffff" />
+  <rect x="20" y="20" width="860" height="710" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+
+  <!-- Header -->
+  <text x="450" y="55" text-anchor="middle" class="title">Synexis — Multi-Modal AI Root Cause Analysis (RCA) Flow</text>
+  <text x="450" y="75" text-anchor="middle" class="subtitle">Evidence Fusion • Grounded LLM Reasoning • Structured JSON Diagnostic Schema</text>
+
+  <!-- Inputs (Left Column) -->
+  <rect x="60" y="110" width="300" height="240" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="210" y="135" text-anchor="middle" class="box-title">Multi-Modal Incident Evidence</text>
+  <text x="80" y="165" class="box-desc">• Incident Metadata (Title, Service, Severity)</text>
+  <text x="80" y="190" class="box-desc">• Host Metrics (CPU %, RAM MB, Swap, Disk)</text>
+  <text x="80" y="215" class="box-desc">• Docker Container State &amp; Exit Codes</text>
+  <text x="80" y="240" class="box-desc">• Application Error Log Traces (Last 30s)</text>
+  <text x="80" y="265" class="box-desc">• Database Probe Latency &amp; Status</text>
+  <text x="80" y="290" class="box-desc">• Active Deduplication Fingerprints</text>
+
+  <!-- Context (Left Bottom) -->
+  <rect x="60" y="370" width="300" height="110" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5" />
+  <text x="210" y="395" text-anchor="middle" class="box-title" fill="#3730a3">Vector RAG Runbook Citations</text>
+  <text x="80" y="420" class="box-desc" fill="#4338ca">• Top-K Matched Runbook Documents</text>
+  <text x="80" y="440" class="box-desc" fill="#4338ca">• Troubleshooting Playbooks &amp; Excerpts</text>
+  <text x="80" y="460" class="box-desc" fill="#4338ca">• Historical Incident Post-Mortems</text>
+
+  <!-- AI Synthesis Engine (Center) -->
+  <rect x="420" y="240" width="180" height="110" rx="10" fill="#ffffff" stroke="#6366f1" stroke-width="2" />
+  <text x="510" y="270" text-anchor="middle" class="box-title" fill="#4338ca">AI Diagnostic Engine</text>
+  <text x="510" y="295" text-anchor="middle" class="box-desc">Gemini / OpenAI</text>
+  <text x="510" y="315" text-anchor="middle" class="box-desc">+ Deterministic</text>
+  <text x="510" y="335" text-anchor="middle" class="box-desc">Rule Fallback</text>
+
+  <!-- Connectors into AI -->
+  <path d="M 360 230 L 420 280" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+  <path d="M 360 425 L 390 425 L 390 310 L 420 310" fill="none" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- Output Schema (Right Column) -->
+  <rect x="640" y="110" width="220" height="370" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="750" y="135" text-anchor="middle" class="box-title">Structured RCA Output</text>
+
+  <rect x="655" y="150" width="190" height="45" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="665" y="168" class="schema-field">root_cause</text>
+  <text x="665" y="184" class="box-desc">Deterministic failure reason</text>
+
+  <rect x="655" y="205" width="190" height="45" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="665" y="223" class="schema-field">confidence (0-100%)</text>
+  <text x="665" y="239" class="box-desc">Evidence-grounded score</text>
+
+  <rect x="655" y="260" width="190" height="45" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="665" y="278" class="schema-field">evidence []</text>
+  <text x="665" y="294" class="box-desc">Observed telemetry facts</text>
+
+  <rect x="655" y="315" width="190" height="45" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="665" y="333" class="schema-field">recommendation</text>
+  <text x="665" y="349" class="box-desc">SRE operator advice</text>
+
+  <rect x="655" y="370" width="190" height="50" rx="6" fill="#f0fdf4" stroke="#bbf7d0" />
+  <text x="665" y="388" class="schema-field" fill="#15803d">structured_actions []</text>
+  <text x="665" y="405" class="box-desc" fill="#166534">action, target (synexis-*)</text>
+
+  <rect x="655" y="430" width="190" height="40" rx="6" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="665" y="448" class="schema-field">rag_sources []</text>
+  <text x="665" y="462" class="box-desc">Citations with similarity %</text>
+
+  <!-- Line from AI to Schema -->
+  <line x1="600" y1="295" x2="640" y2="295" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- Footer explanation -->
+  <rect x="60" y="520" width="800" height="170" rx="10" fill="#f8fafc" stroke="#e2e8f0" />
+  <text x="85" y="550" class="box-title">Key Architectural Properties:</text>
+  <text x="85" y="580" class="box-desc">1. Grounded Output: AI reasoning is strictly bounded by live incident telemetry and retrieved RAG runbooks.</text>
+  <text x="85" y="605" class="box-desc">2. Zero Arbitrary Commands: The LLM cannot produce raw bash commands; it only selects from authorized structured action types.</text>
+  <text x="85" y="630" class="box-desc">3. Deterministic Fallback: If external AI APIs (Gemini/OpenAI) are offline, local heuristic SRE rules provide 100% reliable root cause identification.</text>
+  <text x="85" y="655" class="box-desc">4. Permanent Audit: Analysis outcomes, confidence scores, and structured proposals are persisted in the database.</text>
+</svg>

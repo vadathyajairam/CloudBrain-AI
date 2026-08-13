@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 900" width="100%" height="100%">
+  <defs>
+    <style>
+      .title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 18px; fill: #0f172a; }
+      .subtitle { font-family: 'Inter', -apple-system, sans-serif; font-weight: 400; font-size: 12px; fill: #64748b; }
+      .box-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 600; font-size: 13px; fill: #1e293b; }
+      .box-desc { font-family: 'JetBrains Mono', monospace; font-size: 11px; fill: #475569; }
+      .warn-text { font-family: 'Inter', -apple-system, sans-serif; font-size: 11px; fill: #b45309; font-weight: 600; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#e11d48" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="950" height="900" fill="#ffffff" />
+  <rect x="20" y="20" width="910" height="860" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+
+  <!-- Header -->
+  <text x="475" y="55" text-anchor="middle" class="title">Synexis — Safe Human-in-the-Loop Remediation Flow</text>
+  <text x="475" y="75" text-anchor="middle" class="subtitle">Strict Authorization • Sandbox Allowlist • Docker SDK Dispatch • Zero Arbitrary Shell Execution</text>
+
+  <!-- Step 1: AI / Operator Action Proposal -->
+  <rect x="300" y="105" width="350" height="55" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="475" y="128" text-anchor="middle" class="box-title">Structured Action Proposal</text>
+  <text x="475" y="146" text-anchor="middle" class="box-desc">Action: restart_container | Target: synexis-postgres</text>
+  <line x1="475" y1="160" x2="475" y2="195" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- Step 2: Allowlist Validation Engine -->
+  <rect x="250" y="195" width="450" height="75" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="475" y="220" text-anchor="middle" class="box-title">Safety &amp; Allowlist Validation Engine</text>
+  <text x="475" y="240" text-anchor="middle" class="box-desc">✓ Action ∈ [restart_container, start_container, stop_container]</text>
+  <text x="475" y="258" text-anchor="middle" class="box-desc">✓ Target.startswith("synexis-") (Sandbox Isolation Boundary)</text>
+  <line x1="475" y1="270" x2="475" y2="305" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- Step 3: Human Operator Gate -->
+  <rect x="250" y="305" width="450" height="90" rx="8" fill="#fef3c7" stroke="#fde047" stroke-width="1.5" />
+  <text x="475" y="330" text-anchor="middle" class="box-title" fill="#854d0e">Human-in-the-Loop Operator Decision Gate</text>
+  <text x="475" y="352" text-anchor="middle" class="warn-text">Requires Role Authorization: admin or sre_operator</text>
+  <text x="475" y="375" text-anchor="middle" class="box-desc" fill="#a16207">Status: PENDING Operator Review</text>
+
+  <!-- Decision Branches: REJECT vs APPROVE -->
+  <!-- Rejection Branch (Left) -->
+  <path d="M 330 395 L 330 430 L 160 430 L 160 465" fill="none" stroke="#e11d48" stroke-width="1.5" marker-end="url(#arrow-red)" />
+  <text x="210" y="420" text-anchor="middle" class="warn-text" fill="#e11d48">[ Operator REJECT ]</text>
+
+  <rect x="50" y="465" width="240" height="85" rx="8" fill="#fff1f2" stroke="#fecdd3" stroke-width="1.5" />
+  <text x="170" y="490" text-anchor="middle" class="box-title" fill="#be123c">Action REJECTED</text>
+  <text x="170" y="512" text-anchor="middle" class="box-desc" fill="#9f1239">No Docker command runs</text>
+  <text x="170" y="532" text-anchor="middle" class="box-desc" fill="#9f1239">Logged in audit_logs</text>
+
+  <!-- Approval Branch (Right) -->
+  <path d="M 620 395 L 620 430 L 750 430 L 750 465" fill="none" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arrow-green)" />
+  <text x="700" y="420" text-anchor="middle" class="warn-text" fill="#16a34a">[ Operator APPROVE ]</text>
+
+  <rect x="630" y="465" width="240" height="85" rx="8" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" />
+  <text x="750" y="490" text-anchor="middle" class="box-title" fill="#15803d">Action APPROVED</text>
+  <text x="750" y="512" text-anchor="middle" class="box-desc" fill="#166534">Authorized identity recorded</text>
+  <text x="750" y="532" text-anchor="middle" class="box-desc" fill="#166534">Status: EXECUTING</text>
+
+  <!-- Line from Approval to Docker SDK -->
+  <line x1="750" y1="550" x2="750" y2="590" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- Step 4: Docker SDK Dispatch -->
+  <rect x="580" y="590" width="340" height="70" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="750" y="615" text-anchor="middle" class="box-title">Docker SDK Execution</text>
+  <text x="750" y="635" text-anchor="middle" class="box-desc">Official Python docker API: container.restart()</text>
+  <text x="750" y="650" text-anchor="middle" class="box-desc">Target: synexis-postgres (Port 5433)</text>
+
+  <!-- Line to 4-Point Verification -->
+  <line x1="750" y1="660" x2="750" y2="700" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- Step 5: Real 4-Point Health Verification -->
+  <rect x="560" y="700" width="370" height="65" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" />
+  <text x="745" y="722" text-anchor="middle" class="box-title" fill="#166534">Real 4-Point Health Verification</text>
+  <text x="745" y="742" text-anchor="middle" class="box-desc" fill="#15803d">Process State • Healthcheck • App Probe • Logs</text>
+
+  <!-- Step 6: Permanent Audit Logging (Bottom Full Width) -->
+  <rect x="50" y="795" width="850" height="60" rx="8" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5" />
+  <text x="475" y="820" text-anchor="middle" class="box-title" fill="#3730a3">Permanent Compliance Audit Trail (Table: audit_logs)</text>
+  <text x="475" y="840" text-anchor="middle" class="box-desc" fill="#4338ca">Records: Timestamp • Actor • Role • Action • Target Container • Result • Verification Outcome</text>
+
+  <!-- Link both paths into audit log -->
+  <path d="M 170 550 L 170 825 L 50 825" fill="none" stroke="#64748b" stroke-width="1" stroke-dasharray="3" />
+  <line x1="750" y1="765" x2="750" y2="795" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)" />
+</svg>

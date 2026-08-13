@@ -102,15 +102,18 @@ Synexis introduces a fully integrated, safe, evidence-grounded operational loop:
 |  | Audit Logger      |  | Knowledge Indexer |  | Database Engine                | |
 |  | (Compliance Log)  |  | (Incident Learning|  | (PostgreSQL / SQLite 2.0 via   | |
 |  |                   |  |  Feedback Loop)   |  |  DATABASE_URL)                 | |
-|  └───────────────────┘  └───────────────────┘  └────────────────────────────────┘ |
+|  └─────────┴─────────┘  └─────────┴─────────┘  └───────────────┬────────────────┘ |
 +------------------+-----------------------+---------------------+------------------+
                    |                       |                     |
                    v                       v                     v
           ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
           | Local Machine   |    | Docker Engine   |    | Database Store  |
-          | (psutil OS)     |    | (Docker SDK)    |    | (Postgres/SQLite|
+          | (psutil Metrics)|    | (synexis-* fleet|    | (PostgreSQL /   |
+          |                 |    |  SDK Control)   |    |  SQLite DB)     |
           └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
+
+> **High-Resolution Vector Diagrams:** Comprehensive architecture, sandbox, workflow, and lifecycle vector diagrams are available in [`docs/diagrams/DIAGRAMS.md`](docs/diagrams/DIAGRAMS.md) and as SVG assets in [`docs/diagrams/`](docs/diagrams/).
 
 ---
 
