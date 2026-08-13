@@ -120,6 +120,8 @@ Synexis introduces a fully integrated, safe, evidence-grounded operational loop:
 > **Academic Project Report:** The comprehensive 26-section academic specification is published at [`docs/report/SYNEXIS_PROJECT_REPORT.md`](docs/report/SYNEXIS_PROJECT_REPORT.md).
 >
 > **Viva & Presentation Materials:** Slide deck ([`PRESENTATION.md`](docs/presentation/PRESENTATION.md)), defense Q&A guide ([`VIVA_QUESTIONS.md`](docs/presentation/VIVA_QUESTIONS.md)), live demo script ([`LIVE_DEMO_SCRIPT.md`](docs/presentation/LIVE_DEMO_SCRIPT.md)), and exam cheat sheet ([`CHEAT_SHEET.md`](docs/presentation/CHEAT_SHEET.md)).
+>
+> **Final Pre-Submission Audit:** Verified evaluation matrix and quality scorecard in [`docs/FINAL_AUDIT.md`](docs/FINAL_AUDIT.md).
 
 ---
 
