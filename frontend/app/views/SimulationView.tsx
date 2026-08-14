@@ -69,8 +69,8 @@ export const SimulationView: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {resources.map((r) => (
-            <div key={r.id} className="p-4 border border-slate-200 rounded-lg bg-slate-50/50 hover:bg-white transition-all space-y-2">
+          {resources.map((r, idx) => (
+            <div key={r.id || `sim-${idx}`} className="p-4 border border-slate-200 rounded-lg bg-slate-50/50 hover:bg-white transition-all space-y-2">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-slate-900 text-xs font-mono">{r.name}</span>
                 <StatusBadge status={r.status} />
