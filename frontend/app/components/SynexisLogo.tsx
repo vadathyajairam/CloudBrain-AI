@@ -4,7 +4,7 @@ import React from "react";
 
 export interface SynexisLogoProps {
   variant?: "icon" | "full" | "horizontal";
-  theme?: "dark" | "light";
+  theme?: "dark" | "light" | "monochrome";
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
   showSubtitle?: boolean;
@@ -19,7 +19,6 @@ export const SynexisLogo: React.FC<SynexisLogoProps> = ({
   showSubtitle = true,
   subtitle = "System Analysis & Automation",
 }) => {
-  // Size dimensions for icon
   const sizeMap = {
     sm: { icon: 24, text: "text-xs", sub: "text-[8px]" },
     md: { icon: 32, text: "text-sm", sub: "text-[10px]" },
@@ -29,87 +28,46 @@ export const SynexisLogo: React.FC<SynexisLogoProps> = ({
 
   const dim = sizeMap[size] || sizeMap.md;
   const isDark = theme === "dark";
+  const isMono = theme === "monochrome";
+
+  // Color mappings
+  const form1Color = isMono ? (isDark ? "#FFFFFF" : "#000000") : "#6366F1"; // Indigo
+  const form2Color = isMono ? (isDark ? "#FFFFFF" : "#000000") : "#8B5CF6"; // Violet
+  const form3Color = isMono ? (isDark ? "#FFFFFF" : "#000000") : "#38BDF8"; // Cyan
+  const coreColor  = isMono ? (isDark ? "#000000" : "#FFFFFF") : (isDark ? "#FFFFFF" : "#0F172A");
 
   const markSvg = (
     <svg
       width={dim.icon}
       height={dim.icon}
-      viewBox="0 0 120 120"
+      viewBox="0 0 100 100"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className="shrink-0 transition-transform duration-300 hover:scale-105"
     >
-      <defs>
-        {/* Main Gradient */}
-        <linearGradient id="synexis-grad-primary" x1="15" y1="15" x2="105" y2="105" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#6366F1" />
-          <stop offset="50%" stopColor="#8B5CF6" />
-          <stop offset="100%" stopColor="#38BDF8" />
-        </linearGradient>
-
-        {/* Accent Glow */}
-        <linearGradient id="synexis-grad-accent" x1="100" y1="20" x2="20" y2="100" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#38BDF8" />
-          <stop offset="100%" stopColor="#6366F1" />
-        </linearGradient>
-
-        {/* Node Glow */}
-        <radialGradient id="synexis-node-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#6366F1" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-
-      {/* Hexagonal Outer Node Frame */}
+      {/* Form 1: Telemetry Ingestion Vector (Top-Left) */}
       <path
-        d="M 60 12 L 102 36 L 102 84 L 60 108 L 18 84 L 18 36 Z"
-        fill={isDark ? "#0F172A" : "#F8FAFC"}
-        stroke="url(#synexis-grad-primary)"
-        strokeWidth="3.5"
-        strokeLinejoin="round"
-        opacity="0.9"
+        d="M 16 20 H 46 V 46 H 30 C 22 46 16 40 16 32 Z"
+        fill={form1Color}
       />
 
-      {/* Background Micro Grid Node Tracks */}
+      {/* Form 2: AI Reasoning Vector (Top-Right) */}
       <path
-        d="M 38 36 H 82 M 38 84 H 82 M 60 12 V 108"
-        stroke={isDark ? "#334155" : "#CBD5E1"}
-        strokeWidth="1.5"
-        strokeDasharray="3 3"
-        opacity="0.4"
+        d="M 84 20 V 50 H 54 V 34 C 54 26 60 20 68 20 Z"
+        fill={form2Color}
       />
 
-      {/* Primary Geometric "S" Flow Vector */}
+      {/* Form 3: Automated Remediation Vector (Bottom) */}
       <path
-        d="M 82 34 C 82 20, 38 20, 38 42 C 38 62, 82 58, 82 78 C 82 100, 38 100, 38 86"
-        fill="none"
-        stroke="url(#synexis-grad-primary)"
-        strokeWidth="9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M 50 84 L 20 54 H 46 C 54 54 60 60 60 68 V 84 Z"
+        fill={form3Color}
       />
 
-      {/* Secondary Parallel Observability Vector */}
+      {/* Central Focal Intelligence Core (Diamond) */}
       <path
-        d="M 76 34 C 76 26, 44 26, 44 42 C 44 56, 76 64, 76 78 C 76 94, 44 94, 44 86"
-        fill="none"
-        stroke="url(#synexis-grad-accent)"
-        strokeWidth="3"
-        strokeLinecap="round"
-        opacity="0.85"
+        d="M 50 38 L 62 50 L 50 62 L 38 50 Z"
+        fill={coreColor}
       />
-
-      {/* Intelligent Node Points */}
-      <circle cx="82" cy="34" r="7" fill="url(#synexis-node-glow)" />
-      <circle cx="82" cy="34" r="4.5" fill="#38BDF8" />
-      <circle cx="82" cy="34" r="2" fill="#FFFFFF" />
-
-      <circle cx="60" cy="60" r="8" fill="url(#synexis-node-glow)" />
-      <circle cx="60" cy="60" r="5" fill="#6366F1" stroke="#FFFFFF" strokeWidth="1.5" />
-
-      <circle cx="38" cy="86" r="7" fill="url(#synexis-node-glow)" />
-      <circle cx="38" cy="86" r="4.5" fill="#38BDF8" />
-      <circle cx="38" cy="86" r="2" fill="#FFFFFF" />
     </svg>
   );
 

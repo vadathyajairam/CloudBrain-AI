@@ -12,7 +12,7 @@ interface LiveChartProps {
   data: DataPoint[];
   title: string;
   unit?: string;
-  color?: string; // e.g. "#06b6d4", "#6366f1", "#f43f5e", "#10b981"
+  color?: string; // e.g. "#4f46e5", "#6366f1", "#0284c7", "#10b981"
   secondaryColor?: string;
   primaryLabel?: string;
   secondaryLabel?: string;
@@ -24,18 +24,18 @@ export const LiveChart: React.FC<LiveChartProps> = ({
   data,
   title,
   unit = "%",
-  color = "#06b6d4",
-  secondaryColor = "#6366f1",
+  color = "#4f46e5",
+  secondaryColor = "#8b5cf6",
   primaryLabel = "Primary",
   secondaryLabel = "Secondary",
-  height = 180,
+  height = 200,
   maxVal = 100,
 }) => {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-44 text-slate-500 text-xs font-mono">
+      <div className="flex items-center justify-center h-52 bg-white border border-slate-200 rounded-xl text-slate-400 text-xs font-mono">
         Awaiting telemetry data stream...
       </div>
     );
@@ -70,37 +70,44 @@ export const LiveChart: React.FC<LiveChartProps> = ({
   const primaryPoints = generatePath("value");
   const secondaryPoints = data[0]?.secondaryValue !== undefined ? generatePath("secondaryValue") : null;
 
-  // Area fill path
-  const areaPath = `M ${paddingX},${height - paddingY} ` +
+  // Area fill path for primary value
+  const areaPath =
+    `M ${paddingX},${height - paddingY} ` +
     data.map((d, i) => `L ${getX(i)},${getY(d.value)}`).join(" ") +
     ` L ${getX(data.length - 1)},${height - paddingY} Z`;
 
   const hoveredPoint = hoverIndex !== null && data[hoverIndex] ? data[hoverIndex] : data[data.length - 1];
 
+  const uniqueGradId = `grad-${title.replace(/[^a-zA-Z0-9]/g, "")}`;
+
   return (
-    <div className="w-full relative">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center space-x-3">
-          <span className="text-xs font-medium text-slate-300 tracking-wide uppercase">{title}</span>
-          <div className="flex items-center space-x-2 text-[11px]">
-            <span className="inline-flex items-center gap-1.5 text-slate-400">
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
-              {primaryLabel}: <strong className="text-white font-mono">{hoveredPoint?.value?.toFixed(1)}{unit}</strong>
-            </span>
-            {secondaryPoints && (
-              <span className="inline-flex items-center gap-1.5 text-slate-400 ml-2">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: secondaryColor }} />
-                {secondaryLabel}: <strong className="text-white font-mono">{hoveredPoint?.secondaryValue?.toFixed(1)}{unit}</strong>
-              </span>
-            )}
-          </div>
+    <div className="w-full bg-white border border-slate-200 rounded-xl p-5 shadow-2xs">
+      {/* Header & Legends */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+        <div>
+          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider font-sans">
+            {title}
+          </h3>
         </div>
-        <span className="text-[10px] font-mono text-slate-400">
-          {hoveredPoint?.timestamp}
-        </span>
+        <div className="flex items-center space-x-4 text-xs">
+          <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
+            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+            {primaryLabel}: <strong className="text-slate-900 font-mono font-bold">{hoveredPoint?.value?.toFixed(1)}{unit}</strong>
+          </span>
+          {secondaryPoints && (
+            <span className="inline-flex items-center gap-1.5 text-slate-600 font-medium">
+              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: secondaryColor }} />
+              {secondaryLabel}: <strong className="text-slate-900 font-mono font-bold">{hoveredPoint?.secondaryValue?.toFixed(1)}{unit}</strong>
+            </span>
+          )}
+          <span className="text-[10px] font-mono text-slate-400 ml-2">
+            {hoveredPoint?.timestamp}
+          </span>
+        </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-lg bg-slate-950/60 border border-slate-800/80 p-2">
+      {/* SVG Canvas Container */}
+      <div className="relative overflow-hidden">
         <svg
           viewBox={`0 0 ${width} ${height}`}
           className="w-full h-auto select-none"
@@ -116,9 +123,9 @@ export const LiveChart: React.FC<LiveChartProps> = ({
           }}
         >
           <defs>
-            <linearGradient id={`grad-${title.replace(/\s+/g, "")}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={color} stopOpacity="0.35" />
-              <stop offset="90%" stopColor={color} stopOpacity="0.0" />
+            <linearGradient id={uniqueGradId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity="0.12" />
+              <stop offset="100%" stopColor={color} stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -132,17 +139,18 @@ export const LiveChart: React.FC<LiveChartProps> = ({
                   y1={y}
                   x2={width - paddingX}
                   y2={y}
-                  stroke="#1e293b"
+                  stroke="#E2E8F0"
                   strokeDasharray="3 3"
                   strokeWidth="1"
                 />
                 <text
-                  x={paddingX - 6}
+                  x={paddingX - 8}
                   y={y + 3}
                   textAnchor="end"
-                  fill="#64748b"
-                  fontSize="9"
+                  fill="#94A3B8"
+                  fontSize="10"
                   fontFamily="monospace"
+                  fontWeight="500"
                 >
                   {Math.round(pct * maxVal)}
                 </text>
@@ -150,23 +158,10 @@ export const LiveChart: React.FC<LiveChartProps> = ({
             );
           })}
 
-          {/* Fill gradient */}
-          <path d={areaPath} fill={`url(#grad-${title.replace(/\s+/g, "")})`} />
+          {/* Soft Gradient Area Fill */}
+          <path d={areaPath} fill={`url(#${uniqueGradId})`} />
 
-          {/* Secondary Line */}
-          {secondaryPoints && (
-            <polyline
-              fill="none"
-              stroke={secondaryColor}
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeDasharray="4 2"
-              points={secondaryPoints}
-            />
-          )}
-
-          {/* Primary Line */}
+          {/* Primary Line Path */}
           <polyline
             fill="none"
             stroke={color}
@@ -176,7 +171,20 @@ export const LiveChart: React.FC<LiveChartProps> = ({
             points={primaryPoints}
           />
 
-          {/* Hover indicator line & dot */}
+          {/* Secondary Line Path */}
+          {secondaryPoints && (
+            <polyline
+              fill="none"
+              stroke={secondaryColor}
+              strokeWidth="2"
+              strokeDasharray="4 4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              points={secondaryPoints}
+            />
+          )}
+
+          {/* Hover Crosshair Guide */}
           {hoverIndex !== null && (
             <g>
               <line
@@ -184,18 +192,28 @@ export const LiveChart: React.FC<LiveChartProps> = ({
                 y1={paddingY}
                 x2={getX(hoverIndex)}
                 y2={height - paddingY}
-                stroke="#94a3b8"
-                strokeWidth="1"
+                stroke="#6366F1"
+                strokeWidth="1.5"
                 strokeDasharray="2 2"
               />
               <circle
                 cx={getX(hoverIndex)}
-                cy={getY(data[hoverIndex].value)}
-                r="4.5"
+                cy={getY(hoveredPoint.value)}
+                r="4"
                 fill={color}
-                stroke="#0f172a"
+                stroke="#FFFFFF"
                 strokeWidth="2"
               />
+              {hoveredPoint.secondaryValue !== undefined && (
+                <circle
+                  cx={getX(hoverIndex)}
+                  cy={getY(hoveredPoint.secondaryValue)}
+                  r="4"
+                  fill={secondaryColor}
+                  stroke="#FFFFFF"
+                  strokeWidth="2"
+                />
+              )}
             </g>
           )}
         </svg>

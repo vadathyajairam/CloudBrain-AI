@@ -14,7 +14,7 @@ No fake telemetry is injected.  Real Docker → real metrics → real detection.
 from __future__ import annotations
 
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 import httpx
