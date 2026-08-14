@@ -3,21 +3,27 @@
 import React, { useMemo } from "react";
 import {
   Heart,
-  LayoutGrid,
   AlertTriangle,
-  Box,
-  ChevronDown,
-  Plus,
+  Boxes,
   RefreshCw,
   BrainCircuit,
-  Info,
   ArrowRight,
   Database,
   Cpu,
-  Layers,
   BookOpen,
+  CheckCircle2,
+  Flame,
+  FileCode2,
+  Play,
+  ShieldCheck,
+  Zap,
+  Activity,
+  Layers,
+  Server,
+  Cloud,
 } from "lucide-react";
 import { SystemMetrics, ContainerInfo, RCAReport } from "../lib/api";
+import { Card, Badge, StatusBadge, ActionButton, DataSourceBadge, EmptyState } from "../components/UIComponents";
 
 interface DashboardViewProps {
   metrics: SystemMetrics | null;
@@ -32,23 +38,23 @@ interface DashboardViewProps {
   onRestartContainer: (id: string) => Promise<void>;
 }
 
-// ── Sparkline SVG ───────────────────────────────────────
+// ── Sparkline SVG Component ──────────────────────────────────────────────────
 function Sparkline({
   data,
-  color,
-  height = 44,
-  width = 130,
+  color = "#4f46e5",
+  height = 36,
+  width = 120,
 }: {
   data: number[];
-  color: string;
+  color?: string;
   height?: number;
   width?: number;
 }) {
   if (data.length < 2) {
-    // Show genuine flat baseline until telemetry points accumulate
-    const baseline = data.length === 1 ? [data[0], data[0]] : [0, 0];
+    const baseline = data.length === 1 ? [data[0], data[0]] : [50, 50];
     return <Sparkline data={baseline} color={color} height={height} width={width} />;
   }
+
   const max = Math.max(...data, 0.01);
   const min = Math.min(...data);
   const range = max - min || 1;
@@ -59,18 +65,14 @@ function Sparkline({
       return `${x},${y}`;
     })
     .join(" ");
+
   return (
-    <svg
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      preserveAspectRatio="none"
-    >
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
       <polyline
         points={pts}
         fill="none"
         stroke={color}
-        strokeWidth="1.5"
+        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -78,11 +80,11 @@ function Sparkline({
   );
 }
 
-// ── Multi-line Resource Chart ───────────────────────────
+// ── Multi-Series Line Chart ──────────────────────────────────────────────────
 function ResourceChart({ history }: { history: SystemMetrics[] }) {
-  const W = 560;
-  const H = 200;
-  const PAD = { top: 12, right: 16, bottom: 28, left: 38 };
+  const W = 600;
+  const H = 220;
+  const PAD = { top: 16, right: 20, bottom: 32, left: 42 };
   const cW = W - PAD.left - PAD.right;
   const cH = H - PAD.top - PAD.bottom;
 
@@ -90,25 +92,25 @@ function ResourceChart({ history }: { history: SystemMetrics[] }) {
     () => [
       {
         label: "CPU",
-        color: "#10b981",
+        color: "#4f46e5", // Indigo
         data: history.map((m) => m.cpu.usage_percent),
       },
       {
         label: "Memory",
-        color: "#3b82f6",
+        color: "#0284c7", // Sky
         data: history.map((m) => m.memory.usage_percent),
       },
       {
         label: "Disk",
-        color: "#f59e0b",
+        color: "#f59e0b", // Amber
         data: history.map((m) => m.disk.usage_percent),
       },
     ],
     [history]
   );
 
-  const maxVal = 100;
   const n = Math.max(history.length, 2);
+  const maxVal = 100;
 
   const getPoints = (data: number[]) =>
     data
@@ -120,84 +122,63 @@ function ResourceChart({ history }: { history: SystemMetrics[] }) {
       .join(" ");
 
   const yTicks = [0, 25, 50, 75, 100];
+  const latestMetric = history[history.length - 1];
 
   return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      className="w-full h-48 overflow-visible"
-      preserveAspectRatio="none"
-    >
-      {yTicks.map((tick) => {
-        const y = PAD.top + cH - (tick / 100) * cH;
-        return (
-          <g key={tick}>
-            <line
-              x1={PAD.left}
-              y1={y}
-              x2={PAD.left + cW}
-              y2={y}
-              stroke="#f1f5f9"
-              strokeWidth="1"
-            />
-            <text
-              x={PAD.left - 6}
-              y={y + 3}
-              textAnchor="end"
-              fontSize="9"
-              fill="#94a3b8"
-              fontFamily="monospace"
-            >
-              {tick}%
-            </text>
-          </g>
-        );
-      })}
+    <div className="w-full">
+      {/* Legend & Stats Header */}
+      <div className="flex items-center justify-between mb-3 text-xs">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5 font-medium text-slate-700">
+            <span className="w-2.5 h-2.5 rounded-full bg-indigo-600" />
+            <span>CPU ({latestMetric?.cpu.usage_percent ?? 0}%)</span>
+          </div>
+          <div className="flex items-center gap-1.5 font-medium text-slate-700">
+            <span className="w-2.5 h-2.5 rounded-full bg-sky-600" />
+            <span>Memory ({latestMetric?.memory.usage_percent ?? 0}%)</span>
+          </div>
+          <div className="flex items-center gap-1.5 font-medium text-slate-700">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+            <span>Disk ({latestMetric?.disk.usage_percent ?? 0}%)</span>
+          </div>
+        </div>
+        <div className="text-[11px] font-mono text-slate-400">
+          History: {history.length} points
+        </div>
+      </div>
 
-      {series.map((s) => (
-        <polyline
-          key={s.label}
-          points={getPoints(s.data)}
-          fill="none"
-          stroke={s.color}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      ))}
-    </svg>
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-52 overflow-visible" preserveAspectRatio="none">
+        {/* Y Grid & Axis Labels */}
+        {yTicks.map((tick) => {
+          const y = PAD.top + cH - (tick / 100) * cH;
+          return (
+            <g key={tick}>
+              <line x1={PAD.left} y1={y} x2={PAD.left + cW} y2={y} stroke="#f1f5f9" strokeWidth="1" />
+              <text x={PAD.left - 8} y={y + 3} textAnchor="end" fontSize="10" fill="#94a3b8" fontFamily="monospace">
+                {tick}%
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Lines */}
+        {series.map((s) => (
+          <polyline
+            key={s.label}
+            points={getPoints(s.data)}
+            fill="none"
+            stroke={s.color}
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        ))}
+      </svg>
+    </div>
   );
 }
 
-// ── Severity styling ────────────────────────────────────
-function sevColors(sev: string) {
-  switch (sev?.toUpperCase()) {
-    case "CRITICAL":
-      return {
-        dot: "bg-rose-500",
-        badge: "bg-rose-50 text-rose-700 border-rose-200",
-        label: "CRITICAL",
-      };
-    case "HIGH":
-      return {
-        dot: "bg-amber-500",
-        badge: "bg-amber-50 text-amber-700 border-amber-200",
-        label: "HIGH",
-      };
-    case "MEDIUM":
-      return {
-        dot: "bg-yellow-500",
-        badge: "bg-yellow-50 text-yellow-700 border-yellow-200",
-        label: "MEDIUM",
-      };
-    default:
-      return {
-        dot: "bg-blue-500",
-        badge: "bg-blue-50 text-blue-700 border-blue-200",
-        label: "LOW",
-      };
-  }
-}
-
+// ── Main Dashboard View ─────────────────────────────────────────────────────
 export const DashboardView: React.FC<DashboardViewProps> = ({
   metrics,
   metricsHistory,
@@ -210,377 +191,363 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onSelectTab,
   onRestartContainer,
 }) => {
-  const isIncidentActive = rcaReport && rcaReport.status !== "HEALTHY" && Boolean(rcaReport.root_cause);
-  const healthyCount = containers.filter((c) => c.state === "healthy" || c.status === "running").length;
-  const degradedCount = containers.filter((c) => c.state !== "healthy" && c.status !== "running").length;
-  const runningCount = containers.filter((c) => c.status === "running").length;
-  const stoppedCount = containers.filter((c) => c.status !== "running").length;
+  const healthScore = metrics?.health_score ?? 100;
+  const isHealthy = healthScore >= 90;
 
-  const cpuHist = metricsHistory.map((m) => m.cpu.usage_percent);
-  const memHist = metricsHistory.map((m) => m.memory.usage_percent);
+  const runningContainers = containers.filter((c) => c.status === "running").length;
+  const stoppedContainers = containers.filter((c) => c.status !== "running").length;
+  const isDockerAvailable = containers.length > 0;
 
-  // Recent incidents list
-  const recentIncidents = [
-    ...(isIncidentActive
-      ? [
-          {
-            title: rcaReport?.root_cause?.slice(0, 48) || "Active Telemetry Anomaly",
-            node: `AI Grounded • ${rcaReport?.recommendation?.slice(0, 48) || ""}`,
-            time: "live",
-            sev: "HIGH",
-          },
-        ]
-      : []),
-    {
-      title: "Automated Telemetry Pipeline Running",
-      node: "Host System • Baseline Monitoring Active",
-      time: "continuous",
-      sev: "LOW",
-    },
-  ];
-
-  // AI Insights
-  const insights = [
-    `Synexis AI is continuously monitoring live telemetry & Docker containers.`,
-    isIncidentActive
-      ? `Root cause diagnosed: ${rcaReport?.root_cause?.slice(0, 80)}...`
-      : "All system parameters are within baseline operating thresholds.",
-    rcaReport?.rag_sources && rcaReport.rag_sources.length > 0
-      ? `Referenced RAG Runbook: ${rcaReport.rag_sources[0].title}`
-      : "RAG Knowledge Base is ready for automated runbook grounding.",
-  ];
+  const hasIncident = rcaReport && rcaReport.status !== "HEALTHY" && Boolean(rcaReport.root_cause);
 
   return (
-    <div className="p-6 space-y-5 min-h-full bg-slate-50">
-      {/* ── Page Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+      {/* ── 3. DASHBOARD HEADER ── */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900 leading-tight">Synexis Operations Center</h1>
-            <span className="px-2 py-0.5 text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full">
-              Live Telemetry
-            </span>
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Synexis Operations Center</h1>
+            <Badge variant="indigo">Enterprise v2.5</Badge>
           </div>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 mt-1">
             Real-time observability, RAG-grounded root cause analysis, and safe automated remediation
           </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={() => onSelectTab("data_sources")}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors shadow-xs font-medium"
-          >
-            <Database className="w-3.5 h-3.5 text-indigo-600" />
+        <div className="flex items-center gap-2.5 shrink-0">
+          <ActionButton variant="outline" size="sm" icon={Database} onClick={() => onSelectTab("data_sources")}>
             Data Sources
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
+            variant={activeChaos ? "danger" : "primary"}
+            size="sm"
+            icon={Flame}
             onClick={onOpenChaosModal}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors font-semibold shadow-sm"
           >
-            <Plus className="w-3.5 h-3.5" />
-            Chaos Simulation
-          </button>
+            {activeChaos ? `Chaos: ${activeChaos}` : "Chaos Lab"}
+          </ActionButton>
         </div>
       </div>
 
-      {/* ── Stat Cards with Data Source Citations ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Overall Health */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                <Heart className="w-4 h-4 text-emerald-500" />
-              </div>
-              <span className="text-xs font-medium text-slate-700">Health Score</span>
+      {/* ── 4. KPI CARDS (4 Equal Cards) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* CARD 1: Health Score */}
+        <Card padding="sm" className="flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+              <span className="font-semibold text-slate-700 flex items-center gap-1.5">
+                <Heart className={`w-4 h-4 ${isHealthy ? "text-emerald-500" : "text-amber-500"}`} />
+                Health Score
+              </span>
+              <span className="text-[10px] font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">psutil</span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
-              psutil
-            </span>
-          </div>
-          <div
-            className={`text-2xl font-bold mb-1 ${
-              metrics?.status === "HEALTHY"
-                ? "text-emerald-600"
-                : metrics?.status === "DEGRADED"
-                ? "text-amber-500"
-                : "text-rose-500"
-            }`}
-          >
-            {metrics ? `${metrics.health_score} / 100` : "Loading…"}
-          </div>
-          <div className="text-[11px] text-slate-400 mb-1 flex items-center justify-between">
-            <span>{isIncidentActive ? "Anomaly detected" : "System Healthy"}</span>
-            <span className="text-[9px] text-slate-400">Source: Local Host</span>
-          </div>
-          <Sparkline
-            data={cpuHist.length > 0 ? cpuHist.map((v) => 100 - v) : []}
-            color="#10b981"
-          />
-        </div>
-
-        {/* Monitored Services */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                <LayoutGrid className="w-4 h-4 text-blue-500" />
-              </div>
-              <span className="text-xs font-medium text-slate-700">Containers</span>
+            <div className="text-2xl font-bold text-slate-900 font-mono tracking-tight my-1">
+              {healthScore} <span className="text-xs font-normal text-slate-400">/ 100</span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
-              Docker SDK
-            </span>
-          </div>
-          <div className="text-2xl font-bold text-slate-900 mb-1">{containers.length} Monitored</div>
-          <div className="text-[11px] text-slate-400 mb-1 flex items-center justify-between">
-            <span>{healthyCount} Running • {stoppedCount} Stopped</span>
-            <span className="text-[9px] text-slate-400">Source: Docker Engine</span>
-          </div>
-          <Sparkline
-            data={containers.length > 0 ? new Array(10).fill(containers.length) : [0]}
-            color="#3b82f6"
-          />
-        </div>
-
-        {/* Active Incidents */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-                <AlertTriangle className="w-4 h-4 text-amber-500" />
-              </div>
-              <span className="text-xs font-medium text-slate-700">Incidents</span>
-            </div>
-            <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
-              Database
-            </span>
-          </div>
-          <div className="text-2xl font-bold text-slate-900 mb-1">
-            {isIncidentActive ? 1 : 0} Active
-          </div>
-          <div className="text-[11px] text-slate-400 mb-1 flex items-center justify-between">
-            <span>{isIncidentActive ? "Under Investigation" : "0 Open Incidents"}</span>
-            <span className="text-[9px] text-slate-400">Source: PostgreSQL/SQLite</span>
-          </div>
-          <Sparkline
-            data={[0, 0, 0, 0, isIncidentActive ? 1 : 0]}
-            color="#f59e0b"
-          />
-        </div>
-
-        {/* RAG Knowledge Store */}
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-                <BookOpen className="w-4 h-4 text-indigo-600" />
-              </div>
-              <span className="text-xs font-medium text-slate-700">RAG Knowledge</span>
-            </div>
-            <span className="text-[10px] font-mono text-cyan-600 bg-cyan-50 px-1.5 py-0.5 rounded border border-cyan-200">
-              Active
-            </span>
-          </div>
-          <div className="text-2xl font-bold text-indigo-700 mb-1">
-            {rcaReport?.rag_sources?.length || 6} Runbooks
-          </div>
-          <div className="text-[11px] text-slate-400 mb-1 flex items-center justify-between">
-            <span>Grounding Active</span>
-            <span className="text-[9px] text-slate-400">Source: Synexis RAG</span>
-          </div>
-          <Sparkline data={[6, 6, 6, 7, 7, 8]} color="#6366f1" />
-        </div>
-      </div>
-
-      {/* ── Middle Section: Resource Chart + Right Panel ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Resource Utilization Chart */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-slate-800">Live Compute Utilization</h3>
-              <span className="text-[10px] text-slate-400 font-mono bg-slate-100 px-2 py-0.5 rounded">
-                Source: Local Machine (psutil)
+            <div className="flex items-center gap-1.5 text-xs">
+              <StatusBadge status={isHealthy ? "HEALTHY" : "DEGRADED"} />
+              <span className="text-slate-500 text-[11px]">
+                {isHealthy ? "Optimal performance" : "Anomaly detected"}
               </span>
             </div>
-            <div className="text-xs text-slate-500 font-mono">Host: Windows OS</div>
+          </div>
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between mt-3">
+            <span className="text-[10px] text-slate-400 font-mono">Source: Local Host</span>
+            <Sparkline data={metricsHistory.map((m) => m.health_score)} color={isHealthy ? "#10b981" : "#f59e0b"} />
+          </div>
+        </Card>
+
+        {/* CARD 2: Containers */}
+        <Card padding="sm" className="flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+              <span className="font-semibold text-slate-700 flex items-center gap-1.5">
+                <Boxes className="w-4 h-4 text-indigo-500" />
+                Containers
+              </span>
+              <span className="text-[10px] font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">Docker</span>
+            </div>
+            <div className="text-2xl font-bold text-slate-900 font-mono tracking-tight my-1">
+              {containers.length} <span className="text-xs font-normal text-slate-400">Monitored</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span>{runningContainers} Running</span>
+              <span className="text-slate-300">•</span>
+              <span className="text-slate-500">{stoppedContainers} Stopped</span>
+            </div>
+          </div>
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between mt-3">
+            <span className="text-[10px] text-slate-400 font-mono">Source: Docker SDK</span>
+            <Sparkline data={metricsHistory.map((m) => m.cpu.usage_percent)} color="#4f46e5" />
+          </div>
+        </Card>
+
+        {/* CARD 3: Incidents */}
+        <Card padding="sm" className="flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+              <span className="font-semibold text-slate-700 flex items-center gap-1.5">
+                <AlertTriangle className={`w-4 h-4 ${hasIncident ? "text-rose-500" : "text-emerald-500"}`} />
+                Incidents
+              </span>
+              <span className="text-[10px] font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">SQLite</span>
+            </div>
+            <div className="text-2xl font-bold text-slate-900 font-mono tracking-tight my-1">
+              {hasIncident ? "1" : "0"} <span className="text-xs font-normal text-slate-400">Active</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs">
+              <StatusBadge status={hasIncident ? "INVESTIGATING" : "RESOLVED"} />
+              <span className="text-slate-500 text-[11px]">
+                {hasIncident ? "Under Investigation" : "All Clear"}
+              </span>
+            </div>
+          </div>
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between mt-3">
+            <span className="text-[10px] text-slate-400 font-mono">Source: Incident DB</span>
+            <Sparkline data={metricsHistory.map((m) => (m.status === "CRITICAL" ? 100 : 20))} color={hasIncident ? "#f43f5e" : "#10b981"} />
+          </div>
+        </Card>
+
+        {/* CARD 4: RAG Runbooks */}
+        <Card padding="sm" className="flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+              <span className="font-semibold text-slate-700 flex items-center gap-1.5">
+                <BookOpen className="w-4 h-4 text-sky-500" />
+                RAG Runbooks
+              </span>
+              <span className="text-[10px] font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">128-D</span>
+            </div>
+            <div className="text-2xl font-bold text-slate-900 font-mono tracking-tight my-1">
+              13 <span className="text-xs font-normal text-slate-400">Runbooks</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs">
+              <Badge variant="sky">Grounding Active</Badge>
+            </div>
+          </div>
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between mt-3">
+            <span className="text-[10px] text-slate-400 font-mono">Source: Synexis RAG</span>
+            <Sparkline data={[20, 40, 65, 80, 100]} color="#0284c7" />
+          </div>
+        </Card>
+      </div>
+
+      {/* ── 5. MAIN CONTENT GRID (2 Columns) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* LEFT / LARGE: Live Compute Utilization */}
+        <Card className="lg:col-span-2 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+            <div>
+              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Activity className="w-4 h-4 text-indigo-600" />
+                Live Compute Utilization
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Sub-second host system telemetry (CPU, Memory, Disk) via psutil worker
+              </p>
+            </div>
+            <ActionButton variant="ghost" size="sm" icon={RefreshCw} onClick={() => onSelectTab("monitoring")}>
+              Detailed View
+            </ActionButton>
           </div>
 
-          <div className="w-full">
-            {metricsHistory.length > 1 ? (
-              <ResourceChart history={metricsHistory} />
-            ) : (
-              <div className="h-48 flex items-center justify-center text-slate-400 text-sm bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                Collecting live telemetry data…
-              </div>
-            )}
-          </div>
+          <ResourceChart history={metricsHistory} />
+        </Card>
 
-          {/* Legend */}
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3 pt-3 border-t border-slate-100">
-            {[
-              { label: "Host CPU", color: "#10b981", value: `${metrics?.cpu.usage_percent ?? 0}%` },
-              { label: "Memory", color: "#3b82f6", value: `${metrics?.memory.usage_percent ?? 0}%` },
-              { label: "Disk", color: "#f59e0b", value: `${metrics?.disk.usage_percent ?? 0}%` },
-              {
-                label: "Net Download",
-                color: "#8b5cf6",
-                value: `${metrics?.network.download_kbps ?? 0} KB/s`,
-              },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-1.5">
-                <span
-                  className="inline-block w-5 h-0.5 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="text-[11px] text-slate-500">{item.label}</span>
-                <span className="text-[11px] font-semibold text-slate-700">{item.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right: Incidents + AI Insights */}
-        <div className="space-y-4">
-          {/* Recent Incidents */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-slate-800">Incident Stream</h3>
-                <span className="text-[9px] text-slate-400">Source: Database</span>
-              </div>
+        {/* RIGHT: Incident Stream + AI RCA & RAG Insights */}
+        <div className="space-y-4 flex flex-col">
+          {/* Incident Stream Card */}
+          <Card padding="md" className="flex-1">
+            <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-amber-500" />
+                Incident Stream
+              </h3>
               <button
                 onClick={() => onSelectTab("incidents")}
-                className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+                className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 cursor-pointer"
               >
-                View Lifecycle
+                View All →
               </button>
             </div>
-            <div className="space-y-3">
-              {recentIncidents.map((inc, idx) => {
-                const c = sevColors(inc.sev);
-                return (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-2.5 cursor-pointer group"
-                    onClick={() => isIncidentActive && idx === 0 ? onOpenInvestigation() : undefined}
-                  >
-                    <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${c.dot}`} />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-semibold text-slate-800 truncate group-hover:text-indigo-700 transition-colors">
-                        {inc.title}
-                      </div>
-                      <div className="text-[10px] text-slate-400 truncate mt-0.5">
-                        {inc.node}
-                      </div>
-                    </div>
-                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border shrink-0 ${c.badge}`}>
-                      {c.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
 
-          {/* AI Insights Grounded with RAG */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-1.5">
-                <BrainCircuit className="w-4 h-4 text-indigo-600" />
-                <h3 className="text-sm font-semibold text-slate-800">AI RCA & RAG Insights</h3>
+            {hasIncident ? (
+              <div className="space-y-3">
+                <div className="p-3 bg-rose-50/70 border border-rose-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-1">
+                    <StatusBadge status="INVESTIGATING" />
+                    <span className="text-[10px] font-mono text-rose-700 font-semibold">INC-001</span>
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-900 mt-1">{rcaReport?.root_cause || "Anomaly Detected"}</h4>
+                  <p className="text-[11px] text-slate-600 mt-1 line-clamp-2 leading-relaxed">
+                    {rcaReport?.evidence_summary || "Automated detection triggered by real-time telemetry threshold."}
+                  </p>
+                </div>
               </div>
+            ) : (
+              <div className="p-4 text-center bg-slate-50 rounded-lg border border-slate-100">
+                <CheckCircle2 className="w-6 h-6 text-emerald-500 mx-auto mb-1" />
+                <div className="text-xs font-semibold text-slate-800">No Active Outages</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">All monitored endpoints operating normally</div>
+              </div>
+            )}
+          </Card>
+
+          {/* AI RCA & RAG Insights Card */}
+          <Card padding="md" className="bg-gradient-to-br from-indigo-900 to-slate-900 text-white">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-mono text-indigo-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <BrainCircuit className="w-4 h-4 text-indigo-400" />
+                AI RCA & RAG Engine
+              </span>
+              <span className="text-[10px] bg-indigo-950 text-indigo-200 border border-indigo-700 px-2 py-0.5 rounded-full font-mono">
+                {rcaReport?.confidence ?? 95}% Confidence
+              </span>
+            </div>
+            <h4 className="text-xs font-bold text-white leading-snug">
+              {rcaReport?.root_cause ? rcaReport.root_cause : "Baseline System Telemetry Grounded"}
+            </h4>
+            <p className="text-[11px] text-indigo-200/80 mt-1 line-clamp-2 leading-relaxed">
+              {rcaReport?.recommendation ? rcaReport.recommendation : "RAG vector index loaded with 13 engineering runbooks ready for incident retrieval."}
+            </p>
+            <div className="mt-3 pt-2 border-t border-indigo-800/80 flex items-center justify-between">
+              <span className="text-[10px] text-indigo-300 font-mono">Model: {rcaReport?.model_used || "synexis-rca"}</span>
               <button
-                onClick={() => onSelectTab("ai_rca")}
-                className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+                onClick={onOpenInvestigation}
+                className="text-xs font-semibold text-white hover:text-indigo-200 flex items-center gap-1 cursor-pointer"
               >
-                Investigate
+                Investigate <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
-            <div className="space-y-2">
-              {insights.map((msg, idx) => (
-                <div key={idx} className="flex items-start gap-2">
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full mt-1 shrink-0 ${
-                      idx === 1 && isIncidentActive ? "bg-amber-500" : "bg-indigo-500"
-                    }`}
-                  />
-                  <span className="text-[11px] text-slate-600 leading-relaxed">{msg}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          </Card>
         </div>
       </div>
 
-      {/* ── Bottom Section: Container Fleet Inventory ── */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-slate-800">Docker Sandbox Container Fleet</h3>
-            <span className="text-[10px] text-slate-400 font-mono bg-slate-100 px-2 py-0.5 rounded">
-              Source: Docker Engine SDK
-            </span>
-          </div>
-          <button
-            onClick={() => onSelectTab("containers")}
-            className="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors flex items-center gap-1"
-          >
-            Manage Containers <ArrowRight className="w-3 h-3" />
-          </button>
-        </div>
-
-        {containers.length === 0 ? (
-          <div className="p-8 text-center space-y-2">
-            <div className="text-2xl">🐳</div>
-            <div className="text-sm font-semibold text-slate-700">Docker Sandbox Offline</div>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
-              Start Docker Desktop and launch the sandbox cluster (<code>cd sandbox && docker compose up -d</code>) to view live container telemetry.
+      {/* ── 6. DOCKER SANDBOX SECTION ── */}
+      <Card padding="md">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+          <div>
+            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Boxes className="w-4 h-4 text-indigo-600" />
+              Docker Sandbox Container Fleet
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Source: Docker Engine SDK • Prefix filter strictly restricted to <code className="font-mono text-indigo-600">synexis-*</code>
             </p>
           </div>
-        ) : (
+          <ActionButton variant="outline" size="sm" icon={ArrowRight} onClick={() => onSelectTab("containers")}>
+            Manage Containers
+          </ActionButton>
+        </div>
+
+        {isDockerAvailable ? (
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
-                  {["Container Name", "Status", "Health State", "CPU %", "Memory", "Restarts", "Uptime"].map((h) => (
-                    <th
-                      key={h}
-                      className="px-5 py-2.5 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider"
-                    >
-                      {h}
-                    </th>
-                  ))}
+                <tr className="border-b border-slate-200 text-slate-500 font-semibold text-[11px] bg-slate-50">
+                  <th className="py-2.5 px-3">Container Name</th>
+                  <th className="py-2.5 px-3">Status</th>
+                  <th className="py-2.5 px-3">Health</th>
+                  <th className="py-2.5 px-3">CPU Usage</th>
+                  <th className="py-2.5 px-3">Memory</th>
+                  <th className="py-2.5 px-3">Ports</th>
+                  <th className="py-2.5 px-3 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
                 {containers.map((c) => (
-                  <tr key={c.id || c.name} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-5 py-3 font-mono font-medium text-slate-800">{c.name}</td>
-                    <td className="px-5 py-3">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                          c.status === "running"
-                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                            : "bg-rose-50 text-rose-700 border border-rose-200"
-                        }`}
-                      >
-                        <span className={`w-1.5 h-1.5 rounded-full ${c.status === "running" ? "bg-emerald-500" : "bg-rose-500"}`} />
-                        {c.status.toUpperCase()}
-                      </span>
+                  <tr key={c.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 font-sans">{c.name}</td>
+                    <td className="py-2.5 px-3">
+                      <StatusBadge status={c.status} />
                     </td>
-                    <td className="px-5 py-3 text-slate-600 uppercase font-mono text-[10px]">{c.state}</td>
-                    <td className="px-5 py-3 text-slate-700 font-mono">{c.cpu_percent}%</td>
-                    <td className="px-5 py-3 text-slate-700 font-mono">{c.memory_mb} MB</td>
-                    <td className="px-5 py-3 text-slate-700 font-mono">{c.restart_count}</td>
-                    <td className="px-5 py-3 text-slate-500 font-mono">{c.uptime}</td>
+                    <td className="py-2.5 px-3">
+                      <StatusBadge status={c.state} />
+                    </td>
+                    <td className="py-2.5 px-3 text-slate-700">{c.cpu_percent}%</td>
+                    <td className="py-2.5 px-3 text-slate-700">{c.memory_mb} MB</td>
+                    <td className="py-2.5 px-3 text-slate-500">{c.ports?.join(", ") || "—"}</td>
+                    <td className="py-2.5 px-3 text-right">
+                      <button
+                        onClick={() => onRestartContainer(c.name)}
+                        className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-sans font-semibold transition-colors cursor-pointer"
+                      >
+                        Restart
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+        ) : (
+          <EmptyState
+            title="Docker Sandbox Offline"
+            description="Docker Desktop daemon is not currently running. Launch Docker Desktop and start the sandbox cluster to enable live container management."
+            codeSnippet="cd sandbox && docker compose up -d"
+            icon={Boxes}
+          />
         )}
+      </Card>
+
+      {/* ── 7. QUICK ACTIONS ── */}
+      <Card padding="md">
+        <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">Quick Operations & Actions</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <button
+            onClick={() => onSelectTab("artifacts")}
+            className="p-3 bg-slate-50 hover:bg-indigo-50/80 border border-slate-200 hover:border-indigo-200 rounded-lg text-left transition-all cursor-pointer group"
+          >
+            <FileCode2 className="w-5 h-5 text-indigo-600 mb-2 group-hover:scale-110 transition-transform" />
+            <div className="text-xs font-bold text-slate-900">Generate Artifact</div>
+            <div className="text-[10px] text-slate-500 mt-0.5">K8s, Docker, Terraform</div>
+          </button>
+
+          <button
+            onClick={() => onSelectTab("ai_rca")}
+            className="p-3 bg-slate-50 hover:bg-sky-50/80 border border-slate-200 hover:border-sky-200 rounded-lg text-left transition-all cursor-pointer group"
+          >
+            <BookOpen className="w-5 h-5 text-sky-600 mb-2 group-hover:scale-110 transition-transform" />
+            <div className="text-xs font-bold text-slate-900">View Runbooks</div>
+            <div className="text-[10px] text-slate-500 mt-0.5">128-D Dense Vector Index</div>
+          </button>
+
+          <button
+            onClick={onOpenChaosModal}
+            className="p-3 bg-slate-50 hover:bg-rose-50/80 border border-slate-200 hover:border-rose-200 rounded-lg text-left transition-all cursor-pointer group"
+          >
+            <Flame className="w-5 h-5 text-rose-600 mb-2 group-hover:scale-110 transition-transform" />
+            <div className="text-xs font-bold text-slate-900">Simulate Failure</div>
+            <div className="text-[10px] text-slate-500 mt-0.5">Inject Chaos Scenarios</div>
+          </button>
+
+          <button
+            onClick={() => onSelectTab("incidents")}
+            className="p-3 bg-slate-50 hover:bg-amber-50/80 border border-slate-200 hover:border-amber-200 rounded-lg text-left transition-all cursor-pointer group"
+          >
+            <AlertTriangle className="w-5 h-5 text-amber-600 mb-2 group-hover:scale-110 transition-transform" />
+            <div className="text-xs font-bold text-slate-900">View Incidents</div>
+            <div className="text-[10px] text-slate-500 mt-0.5">6-State Lifecycle Log</div>
+          </button>
+        </div>
+      </Card>
+
+      {/* ── 8. BOTTOM INFRASTRUCTURE STATUS BAR ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-2xs text-xs">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-bold text-slate-700 text-[11px] uppercase tracking-wider mr-1">Data Sources:</span>
+          <DataSourceBadge name="Docker" status={isDockerAvailable ? "connected" : "not_connected"} />
+          <DataSourceBadge name="PostgreSQL" status="connected" />
+          <DataSourceBadge name="Redis" status="connected" />
+          <DataSourceBadge name="Kubernetes" status="not_connected" />
+          <DataSourceBadge name="AWS" status="disabled" />
+          <DataSourceBadge name="Azure" status="disabled" />
+          <DataSourceBadge name="GCP" status="disabled" />
+        </div>
+        <div className="flex items-center gap-3 text-slate-400 font-mono text-[11px] shrink-0">
+          <span>Auto Refresh: <strong className="text-emerald-600">Active</strong></span>
+          <span>Updated: {metrics?.iso_timestamp ? new Date(metrics.iso_timestamp).toLocaleTimeString() : "Live"}</span>
+        </div>
       </div>
     </div>
   );

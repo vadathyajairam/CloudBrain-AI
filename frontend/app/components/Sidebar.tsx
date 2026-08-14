@@ -15,6 +15,11 @@ import {
   Bot,
   BookOpen,
   CheckCircle2,
+  Cpu,
+  Cloud,
+  Sparkles,
+  Shield,
+  Layers,
 } from "lucide-react";
 
 export type NavTab =
@@ -24,6 +29,8 @@ export type NavTab =
   | "ai_rca"
   | "incidents"
   | "containers"
+  | "kubernetes"
+  | "simulation"
   | "data_sources"
   | "artifacts"
   | "config"
@@ -55,62 +62,85 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeChaos,
 }) => {
   const navItems: NavItem[] = [
-    // Main
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, group: "Overview" },
+    // Overview
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, group: "OVERVIEW" },
     // Observability
-    { id: "monitoring", label: "Host Telemetry", icon: Activity, group: "Observability" },
-    { id: "logs", label: "Log Stream", icon: FileText, group: "Observability" },
-    // Intelligence
+    { id: "monitoring", label: "Host Telemetry", icon: Activity, group: "OBSERVABILITY" },
+    { id: "logs", label: "Log Stream", icon: FileText, group: "OBSERVABILITY" },
+    // Intelligence & RAG
     {
       id: "ai_rca",
       label: "AI Root Cause (RCA)",
       icon: BrainCircuit,
-      group: "Intelligence & RAG",
+      group: "INTELLIGENCE & RAG",
       tag: "RAG",
     },
     {
       id: "incidents",
       label: "Incidents Lifecycle",
       icon: AlertOctagon,
-      group: "Intelligence & RAG",
+      group: "INTELLIGENCE & RAG",
       badge: activeIncidentsCount > 0 ? activeIncidentsCount : undefined,
       badgeColor:
         activeIncidentsCount > 0
-          ? "bg-rose-100 text-rose-600 font-bold"
+          ? "bg-rose-500 text-white font-bold animate-pulse"
           : undefined,
     },
     {
       id: "artifacts",
       label: "Config Artifacts",
       icon: BookOpen,
-      group: "Intelligence & RAG",
+      group: "INTELLIGENCE & RAG",
       tag: "K8s/IaC",
     },
     // Infrastructure
-    { id: "containers", label: "Docker Containers", icon: Boxes, group: "Infrastructure" },
-    { id: "data_sources", label: "Data Sources", icon: Database, group: "Infrastructure" },
-    { id: "config", label: "Config & Security", icon: ShieldCheck, group: "Infrastructure" },
+    { id: "containers", label: "Docker Containers", icon: Boxes, group: "INFRASTRUCTURE" },
+    { id: "kubernetes", label: "Kubernetes (Local)", icon: Cpu, group: "INFRASTRUCTURE" },
+    { id: "simulation", label: "Cloud Simulation", icon: Cloud, group: "INFRASTRUCTURE" },
+    { id: "data_sources", label: "Data Sources", icon: Database, group: "INFRASTRUCTURE" },
+    { id: "config", label: "Config & Security", icon: ShieldCheck, group: "INFRASTRUCTURE" },
     // Operations
-    { id: "remediation", label: "Remediation & Audit", icon: Wrench, group: "Operations" },
+    { id: "remediation", label: "Remediation & Audit", icon: Wrench, group: "OPERATIONS" },
     {
       id: "chaos",
       label: "Chaos Sandbox Lab",
       icon: Flame,
-      group: "Operations",
+      group: "OPERATIONS",
       badge: activeChaos ? "ACTIVE" : undefined,
       badgeColor: activeChaos ? "bg-rose-500 text-white font-bold" : undefined,
     },
-    { id: "assistant", label: "DevOps Copilot", icon: Bot, group: "Operations" },
+    { id: "assistant", label: "DevOps Copilot", icon: Bot, group: "OPERATIONS" },
   ];
 
   const groups = Array.from(new Set(navItems.map((item) => item.group)));
 
   return (
-    <aside className="w-64 bg-slate-900 text-slate-300 border-r border-slate-800 flex flex-col shrink-0 h-[calc(100vh-61px)] sticky top-[61px]">
-      <div className="p-3 flex-1 overflow-y-auto space-y-5">
+    <aside className="w-64 bg-slate-900 text-slate-300 border-r border-slate-800/80 flex flex-col shrink-0 h-screen sticky top-0 z-30 select-none">
+      {/* ── Header Brand Card ── */}
+      <div className="p-4 border-b border-slate-800/80 bg-slate-950/40">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white shadow-md shadow-indigo-600/30 shrink-0">
+            <Shield className="w-5 h-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between">
+              <h1 className="text-sm font-bold text-white tracking-tight truncate">Synexis</h1>
+              <span className="text-[10px] font-mono font-semibold text-indigo-300 bg-indigo-950/80 border border-indigo-700/60 px-1.5 py-0.5 rounded">
+                v2.5
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 truncate mt-0.5">
+              Intelligent System Analysis & Automation
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Navigation Tree ── */}
+      <div className="p-3 flex-1 overflow-y-auto space-y-4">
         {groups.map((group) => (
           <div key={group}>
-            <div className="px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+            <div className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
               {group}
             </div>
             <div className="space-y-0.5">
@@ -123,10 +153,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${
                         isActive
-                          ? "bg-indigo-600 text-white shadow-sm shadow-indigo-600/30"
-                          : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                          ? "bg-indigo-600 text-white shadow-sm shadow-indigo-600/40 font-semibold"
+                          : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60"
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
@@ -137,13 +167,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         />
                         <span className="truncate">{item.label}</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         {item.tag && (
                           <span
-                            className={`text-[9px] px-1.5 py-0.5 rounded font-mono uppercase tracking-wide ${
+                            className={`text-[9px] px-1.5 py-0.5 rounded font-mono uppercase font-semibold ${
                               isActive
                                 ? "bg-indigo-700 text-indigo-100"
-                                : "bg-slate-800 text-cyan-400 border border-slate-700"
+                                : "bg-slate-800 text-cyan-400 border border-slate-700/60"
                             }`}
                           >
                             {item.tag}
@@ -167,25 +197,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
         ))}
       </div>
 
-      {/* ── Bottom System Status Card ── */}
-      <div className="p-3 border-t border-slate-800 bg-slate-950/50">
-        <div className="rounded-lg bg-slate-900/80 border border-slate-800 p-2.5 space-y-1.5">
+      {/* ── Bottom Engine Status Footer ── */}
+      <div className="p-3 border-t border-slate-800/80 bg-slate-950/60">
+        <div className="rounded-lg bg-slate-900 border border-slate-800 p-2.5 space-y-1.5">
           <div className="flex items-center justify-between text-[11px]">
             <span className="text-slate-400 font-medium flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
               Engine Status
             </span>
-            <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-800/50">
+            <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-800/60">
               OPERATIONAL
             </span>
           </div>
-          <div className="text-[10px] text-slate-500 flex justify-between">
+          <div className="text-[10px] text-slate-400 flex justify-between">
             <span>RAG Retriever:</span>
-            <span className="text-cyan-400 font-mono">READY</span>
+            <span className="text-cyan-400 font-mono font-semibold">READY</span>
           </div>
-          <div className="text-[10px] text-slate-500 flex justify-between">
+          <div className="text-[10px] text-slate-400 flex justify-between">
             <span>Safety Gate:</span>
-            <span className="text-indigo-400 font-mono">ENFORCED</span>
+            <span className="text-indigo-400 font-mono font-semibold">ENFORCED</span>
+          </div>
+          <div className="pt-1 border-t border-slate-800 text-[9px] text-slate-500 text-center font-mono">
+            Health Check: <span className="text-slate-400">Live Telemetry</span>
           </div>
         </div>
       </div>

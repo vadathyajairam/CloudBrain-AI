@@ -27,6 +27,8 @@ import { ChaosView } from "./views/ChaosView";
 import { RemediationView } from "./views/RemediationView";
 import DataSourcesView from "./views/DataSourcesView";
 import ArtifactsView from "./views/ArtifactsView";
+import { KubernetesView } from "./views/KubernetesView";
+import { SimulationView } from "./views/SimulationView";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>("dashboard");
@@ -138,21 +140,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-indigo-500 selection:text-white">
-      {/* ── Full-width sticky top bar ── */}
-      <Navbar
-        metrics={metrics}
-        activeScenario={chaosData.active_scenario}
-        refreshRate={refreshRate}
-        setRefreshRate={setRefreshRate}
-        onOpenChaosModal={() => setIsChaosModalOpen(true)}
-        onToggleChat={() => setIsChatOpen(!isChatOpen)}
-        isChatOpen={isChatOpen}
-        pageTitle={activeTab}
-      />
-
-      {/* ── Main workspace: sidebar + content ── */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left sidebar */}
+      {/* ── Main workspace: sidebar + top bar + content ── */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left fixed sidebar */}
         <Sidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
@@ -160,68 +150,87 @@ export default function App() {
           activeChaos={chaosData.active_scenario}
         />
 
-        {/* Dynamic content canvas */}
-        <main className="flex-1 overflow-y-auto bg-slate-50">
-          {activeTab === "dashboard" && (
-            <DashboardView
-              metrics={metrics}
-              metricsHistory={metricsHistory}
-              containers={containers}
-              rcaReport={rcaReport}
-              recentLogs={recentLogs}
-              activeChaos={chaosData.active_scenario}
-              onOpenInvestigation={() => handleOpenInvestigation()}
-              onOpenChaosModal={() => setIsChaosModalOpen(true)}
-              onSelectTab={setActiveTab}
-              onRestartContainer={handleRestartContainer}
-            />
-          )}
+        {/* Right workspace area */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Full-width top navigation bar */}
+          <Navbar
+            metrics={metrics}
+            activeScenario={chaosData.active_scenario}
+            refreshRate={refreshRate}
+            setRefreshRate={setRefreshRate}
+            onOpenChaosModal={() => setIsChaosModalOpen(true)}
+            onToggleChat={() => setIsChatOpen(!isChatOpen)}
+            isChatOpen={isChatOpen}
+            pageTitle={activeTab}
+          />
 
-          {activeTab === "monitoring" && (
-            <MonitoringView metrics={metrics} history={metricsHistory} />
-          )}
+          {/* Dynamic content canvas */}
+          <main className="flex-1 overflow-y-auto bg-slate-50">
+            {activeTab === "dashboard" && (
+              <DashboardView
+                metrics={metrics}
+                metricsHistory={metricsHistory}
+                containers={containers}
+                rcaReport={rcaReport}
+                recentLogs={recentLogs}
+                activeChaos={chaosData.active_scenario}
+                onOpenInvestigation={() => handleOpenInvestigation()}
+                onOpenChaosModal={() => setIsChaosModalOpen(true)}
+                onSelectTab={setActiveTab}
+                onRestartContainer={handleRestartContainer}
+              />
+            )}
 
-          {activeTab === "logs" && (
-            <LogsView onAnalyzeWithAI={handleAnalyzeLogsWithAI} />
-          )}
+            {activeTab === "monitoring" && (
+              <MonitoringView metrics={metrics} history={metricsHistory} />
+            )}
 
-          {activeTab === "ai_rca" && (
-            <AIRCAView report={rcaReport} onRefresh={fetchAllData} />
-          )}
+            {activeTab === "logs" && (
+              <LogsView onAnalyzeWithAI={handleAnalyzeLogsWithAI} />
+            )}
 
-          {activeTab === "incidents" && <IncidentsView />}
+            {activeTab === "ai_rca" && (
+              <AIRCAView report={rcaReport} onRefresh={fetchAllData} />
+            )}
 
-          {activeTab === "containers" && (
-            <ContainersView containers={containers} onRefresh={fetchAllData} />
-          )}
+            {activeTab === "incidents" && <IncidentsView />}
 
-          {activeTab === "config" && <ConfigView />}
+            {activeTab === "containers" && (
+              <ContainersView containers={containers} onRefresh={fetchAllData} />
+            )}
 
-          {activeTab === "remediation" && <RemediationView />}
+            {activeTab === "kubernetes" && <KubernetesView />}
 
-          {activeTab === "chaos" && (
-            <ChaosView
-              scenarios={chaosData.scenarios}
-              activeScenario={chaosData.active_scenario}
-              onTrigger={handleTriggerChaos}
-              onReset={handleResetChaos}
-              onOpenInvestigation={() => handleOpenInvestigation()}
-            />
-          )}
+            {activeTab === "simulation" && <SimulationView />}
 
-          {activeTab === "artifacts" && <ArtifactsView />}
+            {activeTab === "config" && <ConfigView />}
 
-          {activeTab === "data_sources" && <DataSourcesView />}
+            {activeTab === "remediation" && <RemediationView />}
 
-          {activeTab === "assistant" && (
-            <div className="p-6 space-y-4">
-              <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                Synexis AI DevOps Copilot Chat
-              </h2>
-              <DevOpsChatDrawer isOpen={true} onClose={() => {}} isFullScreen={true} />
-            </div>
-          )}
-        </main>
+            {activeTab === "chaos" && (
+              <ChaosView
+                scenarios={chaosData.scenarios}
+                activeScenario={chaosData.active_scenario}
+                onTrigger={handleTriggerChaos}
+                onReset={handleResetChaos}
+                onOpenInvestigation={() => handleOpenInvestigation()}
+              />
+            )}
+
+            {activeTab === "artifacts" && <ArtifactsView />}
+
+            {activeTab === "data_sources" && <DataSourcesView />}
+
+            {activeTab === "assistant" && (
+              <div className="p-6 space-y-4">
+                <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                  Synexis AI DevOps Copilot Chat
+                </h2>
+                <DevOpsChatDrawer isOpen={true} onClose={() => {}} isFullScreen={true} />
+              </div>
+            )}
+          </main>
+        </div>
       </div>
 
       {/* ── Floating AI Chat Drawer ── */}
