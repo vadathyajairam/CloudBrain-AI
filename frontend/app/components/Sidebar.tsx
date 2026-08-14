@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { SynexisLogo } from "./SynexisLogo";
 import {
   LayoutDashboard,
   Activity,
@@ -118,22 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside className="w-64 bg-slate-900 text-slate-300 border-r border-slate-800/80 flex flex-col shrink-0 h-screen sticky top-0 z-30 select-none">
       {/* ── Header Brand Card ── */}
       <div className="p-4 border-b border-slate-800/80 bg-slate-950/40">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white shadow-md shadow-indigo-600/30 shrink-0">
-            <Shield className="w-5 h-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between">
-              <h1 className="text-sm font-bold text-white tracking-tight truncate">Synexis</h1>
-              <span className="text-[10px] font-mono font-semibold text-indigo-300 bg-indigo-950/80 border border-indigo-700/60 px-1.5 py-0.5 rounded">
-                v2.5
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400 truncate mt-0.5">
-              Intelligent System Analysis & Automation
-            </p>
-          </div>
-        </div>
+        <SynexisLogo variant="horizontal" theme="dark" size="md" showSubtitle={true} />
       </div>
 
       {/* ── Navigation Tree ── */}

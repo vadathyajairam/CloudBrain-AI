@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/synexis-logo.svg" width="120" alt="Synexis Logo" />
+</p>
+
 # Synexis – Intelligent System Analysis and Automation Platform
 
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20v2.5.0-009688?logo=fastapi)](https://fastapi.tiangolo.com/)

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description:
     "Intelligent system analysis and automation platform integrating AI, RAG, Docker, Observability, Root Cause Analysis, and controlled automated remediation.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.svg",
   },
 };
 

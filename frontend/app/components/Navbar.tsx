@@ -135,14 +135,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span className="w-2 h-2 rounded-full bg-rose-500 absolute top-1 right-1 border-2 border-white" />
         </button>
 
-        {/* User Profile Avatar & Role */}
-        <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-          <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
-            SR
-          </div>
-          <div className="hidden lg:block text-left">
-            <div className="text-xs font-semibold text-slate-800 leading-tight">SRE Operator</div>
-            <div className="text-[10px] text-slate-500 font-mono">Admin</div>
+        {/* Compact Operator Authorization & Role Indicator */}
+        <div className="flex items-center pl-2 border-l border-slate-200">
+          <div className="px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200/80 text-slate-700 flex items-center gap-1.5 text-xs">
+            <UserCheck className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+            <span className="font-semibold text-slate-800">SRE Operator</span>
+            <span className="text-slate-300">•</span>
+            <span className="text-[10px] font-mono text-slate-500 font-medium">Admin</span>
           </div>
         </div>
       </div>
