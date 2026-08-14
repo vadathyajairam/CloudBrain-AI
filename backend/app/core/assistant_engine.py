@@ -54,6 +54,15 @@ class AssistantEngine:
             }
         ]
 
+    def get_history(self) -> List[Dict[str, Any]]:
+        return self.chat_history
+
+    def clear_history(self) -> None:
+        if self.chat_history:
+            self.chat_history = [self.chat_history[0]]
+        else:
+            self.chat_history = []
+
     def _get_recent_incidents(self) -> List[Dict[str, Any]]:
         try:
             with db_session() as db:
