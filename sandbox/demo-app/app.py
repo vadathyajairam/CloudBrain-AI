@@ -80,7 +80,7 @@ def health():
     status = "degraded" if active else "healthy"
     return jsonify({
         "status": status,
-        "service": "cloudbrain-demo-app",
+        "service": "synexis-demo-app",
         "uptime": _uptime(),
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "active_chaos": active,
@@ -112,7 +112,7 @@ def get_users():
     if _is_chaos("error_injection"):
         _request_counters["errors"] += 1
         logger.error("psycopg2.OperationalError: could not connect to server: Connection refused")
-        logger.error("Is the server running on host \"cloudbrain-postgres\" and accepting TCP/IP connections on port 5432?")
+        logger.error("Is the server running on host \"synexis-postgres\" and accepting TCP/IP connections on port 5432?")
         return jsonify({"error": "Database connection failed"}), 503
 
     ms = random.randint(8, 55)

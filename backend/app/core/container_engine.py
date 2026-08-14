@@ -2,7 +2,7 @@
 container_engine.py  —  Real Docker Integration for Synexis
 
 Connects to Docker Engine via the Docker SDK for Python.
-Monitors containers matching allowed sandbox prefixes ('synexis-' and 'cloudbrain-').
+Monitors containers matching allowed sandbox prefixes ('synexis-').
 Never fabricates container data. If Docker is offline → returns empty list.
 """
 from __future__ import annotations

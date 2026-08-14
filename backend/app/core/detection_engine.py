@@ -56,6 +56,7 @@ class DetectionResult:
 # ── Port mapping for health checks ───────────────────────────────────────────
 # Map sandbox container names to their exposed host ports.
 _HEALTH_ENDPOINTS: dict[str, str] = {
+    "synexis-demo-app": "http://localhost:5050/health",
     "cloudbrain-demo-app": "http://localhost:5050/health",
 }
 

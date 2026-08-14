@@ -1,7 +1,7 @@
 """
 chaos_engine.py  —  Real Chaos Sandbox for Synexis
 
-Operates ONLY on the synexis-* and cloudbrain-* sandbox containers.
+Operates ONLY on the synexis-* sandbox containers.
 
 Chaos scenarios work by:
   1. Calling the demo-app's /chaos/* HTTP endpoints (cpu, errors, memory, slow)

@@ -3,7 +3,7 @@ import time
 import pytest
 from unittest.mock import patch, MagicMock
 
-os.environ["DATABASE_URL"] = "sqlite:///./test_cloudbrain_int.db"
+os.environ["DATABASE_URL"] = "sqlite:///./test_synexis_int.db"
 os.environ.setdefault("GEMINI_API_KEY", "")
 os.environ.setdefault("OPENAI_API_KEY", "")
 
@@ -29,7 +29,7 @@ def fresh_db():
 class TestFullChaosToResolvePipeline:
     """
     Simulates the full pipeline:
-    1. Detection engine fires container_stopped rule for cloudbrain-postgres
+    1. Detection engine fires container_stopped rule for synexis-postgres
     2. Incident created in DB with DETECTED status
     3. RCA engine analyzes the incident
     4. Remediation proposed (start_container)

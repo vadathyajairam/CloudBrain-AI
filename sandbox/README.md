@@ -7,11 +7,13 @@ It is completely isolated from your host operating system and production infrast
 
 | Container | Role | Host Port |
 |---|---|---|
-| `synexis-demo-app` / `cloudbrain-demo-app` | Flask demo service (generates real logs + chaos endpoints) | 5050 |
-| `synexis-postgres` / `cloudbrain-postgres` | PostgreSQL database | 5433 |
-| `synexis-redis` / `cloudbrain-redis` | Redis cache | 6380 |
+| Container | Role | Host Port |
+|---|---|---|
+| `synexis-demo-app` | Flask demo service (generates real logs + chaos endpoints) | 5050 |
+| `synexis-postgres` | PostgreSQL database | 5433 |
+| `synexis-redis` | Redis cache | 6380 |
 
-Synexis filters to only `synexis-*` and `cloudbrain-*` containers — it will never touch any other Docker containers on your machine.
+Synexis filters strictly to `synexis-*` containers — it will never touch any other Docker containers on your machine.
 
 ## Prerequisites
 
@@ -24,10 +26,10 @@ Synexis filters to only `synexis-*` and `cloudbrain-*` containers — it will ne
 docker compose -f sandbox/docker-compose.yml up -d --build
 
 # Verify containers are running and healthy:
-docker ps --filter "name=cloudbrain-"
+docker ps --filter "name=synexis-"
 
 # View demo app logs (Synexis collects these automatically):
-docker logs -f cloudbrain-demo-app
+docker logs -f synexis-demo-app
 
 # Stop the sandbox:
 docker compose -f sandbox/docker-compose.yml down

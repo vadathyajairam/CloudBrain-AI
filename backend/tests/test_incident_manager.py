@@ -2,7 +2,7 @@ import os
 import pytest
 
 # Force SQLite in-memory DB for tests (must be set before any app imports)
-os.environ["DATABASE_URL"] = "sqlite:///./test_cloudbrain.db"
+os.environ["DATABASE_URL"] = "sqlite:///./test_synexis.db"
 
 from backend.app.database import init_db, engine
 from backend.app.database.models import Base
